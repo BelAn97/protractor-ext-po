@@ -1,2 +1,6 @@
-# protractor-ext-po
-Extension for work with protractor page objects
+# Protractor Extends PO
+
+This library extends the possibilities of working with protractor page objects
+
+## Get Started
+
