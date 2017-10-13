@@ -11,20 +11,20 @@
             this.hasClass('emb-btn-disabled').should.eventually.eq(true, 'check button is disabled: ' + this.locator());
         },
 
-        checkPresent() {
-            this.isPresent().should.eventually.eq(true, 'check element is present: ' + this.locator());
+        checkPresent(msg) {
+            this.isPresent().should.eventually.eq(true, msg || 'check element is present: ' + this.locator());
         },
 
-        checkNotPresent() {
-            this.isPresent().should.eventually.eq(false, 'check element is not present: ' + this.locator());
+        checkNotPresent(msg) {
+            this.isPresent().should.eventually.eq(false, msg || 'check element is not present: ' + this.locator());
         },
 
-        checkMatch(regexp) {
-            this.getText().should.eventually.match(regexp, 'check match: ' + this.locator());
+        checkMatch(regexp, msg) {
+            this.getText().should.eventually.match(regexp, msg || 'check match: ' + this.locator());
         },
 
-        checkValue(regexp) {
-            this.getValue().should.eventually.eq(regexp, 'check value: ' + this.locator());
+        checkValue(value, msg) {
+            this.getValue().should.eventually.eq(value, msg || 'check value: ' + this.locator());
         },
 
     });
