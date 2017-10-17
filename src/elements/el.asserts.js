@@ -35,6 +35,10 @@
             this.getText().should.eventually.eq(text, msg || 'check that text: ' + this.locator());
         },
 
+        checkTextContains(text, msg) {
+            this.getText().should.eventually.contains(text, msg || 'check that text contains: ' + this.locator());
+        },
+
         checkValue(value, msg) {
             this.getValue().should.eventually.eq(value, msg || 'check that value: ' + this.locator());
         },
