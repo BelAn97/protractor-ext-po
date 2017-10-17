@@ -351,39 +351,51 @@ module.exports = new Base();
     Object.assign(ElementFinder.prototype, {
 
         checkButtonEnabled() {
-            this.hasClass('emb-btn-disabled').should.eventually.eq(false, 'check button is enabled: ' + this.locator());
+            this.hasClass('emb-btn-disabled').should.eventually.eq(false, 'check that that button is enabled: ' + this.locator());
         },
 
         checkButtonDisabled() {
-            this.hasClass('emb-btn-disabled').should.eventually.eq(true, 'check button is disabled: ' + this.locator());
+            this.hasClass('emb-btn-disabled').should.eventually.eq(true, 'check that button is disabled: ' + this.locator());
         },
 
         checkPresent(msg) {
-            this.isPresent().should.eventually.eq(true, msg || 'check element is present: ' + this.locator());
+            this.isPresent().should.eventually.eq(true, msg || 'check that element is present: ' + this.locator());
         },
 
         checkNotPresent(msg) {
-            this.isPresent().should.eventually.eq(false, msg || 'check element is not present: ' + this.locator());
+            this.isPresent().should.eventually.eq(false, msg || 'check that element is not present: ' + this.locator());
         },
 
         checkDisplayed(msg) {
-            this.isDisplayed().should.eventually.eq(true, msg || 'check element is displayed: ' + this.locator());
+            this.isDisplayed().should.eventually.eq(true, msg || 'check that element is displayed: ' + this.locator());
         },
 
         checkNotDisplayed(msg) {
-            this.isDisplayed().should.eventually.eq(false, msg || 'check element is not displayed: ' + this.locator());
+            this.isDisplayed().should.eventually.eq(false, msg || 'check that element is not displayed: ' + this.locator());
         },
 
         checkMatch(regexp, msg) {
-            this.getText().should.eventually.match(regexp, msg || 'check match: ' + this.locator());
+            this.getText().should.eventually.match(regexp, msg || 'check that match: ' + this.locator());
         },
 
         checkText(text, msg) {
-            this.getText().should.eventually.eq(text, msg || 'check text: ' + this.locator());
+            this.getText().should.eventually.eq(text, msg || 'check that text: ' + this.locator());
+        },
+
+        checkTextContains(text, msg) {
+            this.getText().should.eventually.contains(text, msg || 'check that text contains: ' + this.locator());
         },
 
         checkValue(value, msg) {
-            this.getValue().should.eventually.eq(value, msg || 'check value: ' + this.locator());
+            this.getValue().should.eventually.eq(value, msg || 'check that value: ' + this.locator());
+        },
+
+        checkHasClass(klass, msg) {
+            this.hasClass(klass).should.eventually.eq(true, msg || 'check that element has the class: ' + this.locator());
+        },
+
+        checkNotHasClass(klass, msg) {
+            this.hasClass(klass).should.eventually.eq(false, msg || 'check that element does not have the class: ' + this.locator());
         },
 
     });
@@ -592,34 +604,74 @@ module.exports = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
         checkPresent(msg) {
-            this.isPresent().should.eventually.eq(true, msg || 'check element is present: ' + this.locator());
+            this.isPresent().should.eventually.eq(true, msg || 'check that element is present: ' + this.locator());
         },
 
         checkNotPresent(msg) {
-            this.isPresent().should.eventually.eq(false, msg || 'check element is not present: ' + this.locator());
+            this.isPresent().should.eventually.eq(false, msg || 'check that element is not present: ' + this.locator());
+        },
+
+        checkDisplayed(msg) {
+            this.isDisplayedOneOf().should.eventually.eq(true, msg || 'check that one of elements is displayed: ' + this.locator());
+        },
+
+        checkNotDisplayed(msg) {
+            this.isDisplayedOneOf().should.eventually.eq(false, msg || 'check that all elements are not displayed: ' + this.locator());
+        },
+
+        checkListEqual(expectedList, msg) {
+            this.should.eventually.eql(expectedList, msg || 'check that list equal: ' + this.locator());
+        },
+
+        checkListNotEqual(expectedList, msg) {
+            this.should.not.eventually.eql(expectedList, msg || 'check that list not equal: ' + this.locator());
+        },
+
+        checkListIncludeMember(member, msg) {
+            this.should.eventually.include(member, msg || 'check that list include the member: ' + this.locator());
+        },
+
+        checkListIncludeMembers(membersList, msg) {
+            this.should.eventually.include.members(membersList, msg || 'check that list include members: ' + this.locator());
+        },
+
+        checkListHaveMembers(membersList, msg) {
+            this.should.eventually.have.members(membersList, msg || 'check that list have members: ' + this.locator());
         },
 
         checkTextListEqual(expectedList, msg) {
-            this.getTextList().should.eventually.eql(expectedList, msg || 'check list equal: ' + this.locator());
+            this.getTextList().checkListEqual(expectedList, msg);
+        },
+
+        checkTextListNotEqual(expectedList, msg) {
+            this.getTextList().checkListNotEqual(expectedList, msg);
+        },
+
+        checkTextListIncludeMember(member, msg) {
+            this.getTextList().checkListIncludeMember(member, msg);
         },
 
         checkTextListIncludeMembers(membersList, msg) {
-            this.getTextList().should.eventually.eql(membersList, msg || 'check list include members: ' + this.locator());
+            this.getTextList().checkListIncludeMembers(membersList, msg);
         },
-        
-        checkTextListNotEqual(expectedList, msg) {
-            this.getTextList().should.not.eventually.eql(expectedList, msg || 'check list not equal: ' + this.locator());
+
+        checkTextListHaveMembers(membersList, msg) {
+            this.getTextList().checkListHaveMembers(membersList, msg);
         },
 
         checkListCount(expectedCount, msg) {
-            this.count().should.eventually.eql(expectedCount, msg || 'check list count: ' + this.locator());
+            this.count().should.eventually.eql(expectedCount, msg || 'check that list count: ' + this.locator());
         },
 
         checkListMatch(regexp, lowerCase, msg) {
+            this.should.eventually.match(regexp, msg || 'check that list match: ' + this.locator());
+        },
+
+        checkTextListMatch(regexp, lowerCase, msg) {
             if (lowerCase) {
-                this.getTextListLowerCase().should.eventually.match(regexp, msg || 'check list match: ' + this.locator());
+                this.getTextListLowerCase().checkListMatch(regexp, lowerCase, msg)
             } else {
-                this.getTextList().should.eventually.match(regexp, msg || 'check list match: ' + this.locator());
+                this.getTextList().checkListMatch(regexp, lowerCase, msg)
             }
         }
 
@@ -739,7 +791,7 @@ module.exports = new Base();
             return this;
         },
 
-        waitDisplayedOneOf (timeout) {
+        waitDisplayedOneOf(timeout) {
             browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, 'wait for visible one of:' + this.locator());
             return this;
         },
