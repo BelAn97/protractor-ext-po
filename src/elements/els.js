@@ -112,7 +112,7 @@
             return this;
         },
 
-        waitDisplayedOneOf (timeout) {
+        waitDisplayedOneOf(timeout) {
             browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, 'wait for visible one of:' + this.locator());
             return this;
         },
