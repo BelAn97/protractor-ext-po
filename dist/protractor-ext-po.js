@@ -5,8 +5,6 @@ const chaiThings = require('chai-things');
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiThings);
 chai.use(chaiAsPromised);
-global.expect = chai.expect;
-global.assert = chai.assert;
 global.should = chai.should();
 global.flow = protractor.promise.controlFlow();
 
