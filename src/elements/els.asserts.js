@@ -3,10 +3,22 @@
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
+        checkPresent(msg) {
+            this.isPresent().should.eventually.eq(true, msg || 'check element is present: ' + this.locator());
+        },
+
+        checkNotPresent(msg) {
+            this.isPresent().should.eventually.eq(false, msg || 'check element is not present: ' + this.locator());
+        },
+
         checkTextListEqual(expectedList, msg) {
             this.getTextList().should.eventually.eql(expectedList, msg || 'check list equal: ' + this.locator());
         },
 
+        checkTextListIncludeMembers(membersList, msg) {
+            this.getTextList().should.eventually.eql(membersList, msg || 'check list include members: ' + this.locator());
+        },
+        
         checkTextListNotEqual(expectedList, msg) {
             this.getTextList().should.not.eventually.eql(expectedList, msg || 'check list not equal: ' + this.locator());
         },

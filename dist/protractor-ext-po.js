@@ -6,6 +6,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiThings);
 chai.use(chaiAsPromised);
 global.expect = chai.expect;
+global.assert = chai.assert;
 global.should = chai.should();
 global.flow = protractor.promise.controlFlow();
 
@@ -50,12 +51,10 @@ class Base {
     };
 
     checkSynch() {
-        if (this.synch !== undefined) {
-            if (this.synch) {
-                this.setSynch();
-            } else {
-                this.setNoSynch();
-            }
+        if (this.angular) {
+            this.setSynch();
+        } else {
+            this.setNoSynch();
         }
     };
 
@@ -119,9 +118,6 @@ class Base {
     at(timeout) {
         return flow.execute(() => {
             this.checkSynch();
-            if (this.angular) {
-                this.loaded.waitReadyAngular();
-            }
             this.logTitle();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Page: ' + (this.url || ''));
         });
@@ -341,13 +337,7 @@ class Base {
     };
 
     static compareLowerCase(a, b) {
-        if (a.toLowerCase() < b.toLowerCase()) {
-            return -1;
-        }
-        if (a.toLowerCase() > b.toLowerCase()) {
-            return 1;
-        }
-        return 0;
+        return a.toLowerCase().localeCompare(b.toLowerCase());
     };
 
     static sortFloat(a, b) {
@@ -370,20 +360,32 @@ module.exports = new Base();
             this.hasClass('emb-btn-disabled').should.eventually.eq(true, 'check button is disabled: ' + this.locator());
         },
 
-        checkPresent() {
-            this.isPresent().should.eventually.eq(true, 'check element is present: ' + this.locator());
+        checkPresent(msg) {
+            this.isPresent().should.eventually.eq(true, msg || 'check element is present: ' + this.locator());
         },
 
-        checkNotPresent() {
-            this.isPresent().should.eventually.eq(false, 'check element is not present: ' + this.locator());
+        checkNotPresent(msg) {
+            this.isPresent().should.eventually.eq(false, msg || 'check element is not present: ' + this.locator());
         },
 
-        checkMatch(regexp) {
-            this.getText().should.eventually.match(regexp, 'check match: ' + this.locator());
+        checkDisplayed(msg) {
+            this.isDisplayed().should.eventually.eq(true, msg || 'check element is displayed: ' + this.locator());
         },
 
-        checkValue(regexp) {
-            this.getValue().should.eventually.eq(regexp, 'check value: ' + this.locator());
+        checkNotDisplayed(msg) {
+            this.isDisplayed().should.eventually.eq(false, msg || 'check element is not displayed: ' + this.locator());
+        },
+
+        checkMatch(regexp, msg) {
+            this.getText().should.eventually.match(regexp, msg || 'check match: ' + this.locator());
+        },
+
+        checkText(text, msg) {
+            this.getText().should.eventually.eq(text, msg || 'check text: ' + this.locator());
+        },
+
+        checkValue(value, msg) {
+            this.getValue().should.eventually.eq(value, msg || 'check value: ' + this.locator());
         },
 
     });
@@ -591,23 +593,35 @@ module.exports = new Base();
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
-        checkTextListEqual(expectedList) {
-            this.getTextList().should.eventually.eql(expectedList, 'check list equal: ' + this.locator());
+        checkPresent(msg) {
+            this.isPresent().should.eventually.eq(true, msg || 'check element is present: ' + this.locator());
         },
 
-        checkTextListNotEqual(expectedList) {
-            this.getTextList().should.not.eventually.eql(expectedList, 'check list not equal: ' + this.locator());
+        checkNotPresent(msg) {
+            this.isPresent().should.eventually.eq(false, msg || 'check element is not present: ' + this.locator());
         },
 
-        checkListCount(expectedCount) {
-            this.count().should.eventually.eql(expectedCount, 'check list count: ' + this.locator());
+        checkTextListEqual(expectedList, msg) {
+            this.getTextList().should.eventually.eql(expectedList, msg || 'check list equal: ' + this.locator());
         },
 
-        checkListMatch(regexp, lowerCase) {
+        checkTextListIncludeMembers(membersList, msg) {
+            this.getTextList().should.eventually.eql(membersList, msg || 'check list include members: ' + this.locator());
+        },
+        
+        checkTextListNotEqual(expectedList, msg) {
+            this.getTextList().should.not.eventually.eql(expectedList, msg || 'check list not equal: ' + this.locator());
+        },
+
+        checkListCount(expectedCount, msg) {
+            this.count().should.eventually.eql(expectedCount, msg || 'check list count: ' + this.locator());
+        },
+
+        checkListMatch(regexp, lowerCase, msg) {
             if (lowerCase) {
-                this.getTextListLowerCase().should.eventually.match(regexp, 'check list match: ' + this.locator());
+                this.getTextListLowerCase().should.eventually.match(regexp, msg || 'check list match: ' + this.locator());
             } else {
-                this.getTextList().should.eventually.match(regexp, 'check list match: ' + this.locator());
+                this.getTextList().should.eventually.match(regexp, msg || 'check list match: ' + this.locator());
             }
         }
 

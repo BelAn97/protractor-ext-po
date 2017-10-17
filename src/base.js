@@ -6,6 +6,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiThings);
 chai.use(chaiAsPromised);
 global.expect = chai.expect;
+global.assert = chai.assert;
 global.should = chai.should();
 global.flow = protractor.promise.controlFlow();
 
@@ -50,12 +51,10 @@ class Base {
     };
 
     checkSynch() {
-        if (this.synch !== undefined) {
-            if (this.synch) {
-                this.setSynch();
-            } else {
-                this.setNoSynch();
-            }
+        if (this.angular) {
+            this.setSynch();
+        } else {
+            this.setNoSynch();
         }
     };
 
@@ -119,9 +118,6 @@ class Base {
     at(timeout) {
         return flow.execute(() => {
             this.checkSynch();
-            if (this.angular) {
-                this.loaded.waitReadyAngular();
-            }
             this.logTitle();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Page: ' + (this.url || ''));
         });
@@ -341,13 +337,7 @@ class Base {
     };
 
     static compareLowerCase(a, b) {
-        if (a.toLowerCase() < b.toLowerCase()) {
-            return -1;
-        }
-        if (a.toLowerCase() > b.toLowerCase()) {
-            return 1;
-        }
-        return 0;
+        return a.toLowerCase().localeCompare(b.toLowerCase());
     };
 
     static sortFloat(a, b) {

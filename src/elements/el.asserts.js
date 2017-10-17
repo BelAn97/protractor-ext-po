@@ -19,8 +19,20 @@
             this.isPresent().should.eventually.eq(false, msg || 'check element is not present: ' + this.locator());
         },
 
+        checkDisplayed(msg) {
+            this.isDisplayed().should.eventually.eq(true, msg || 'check element is displayed: ' + this.locator());
+        },
+
+        checkNotDisplayed(msg) {
+            this.isDisplayed().should.eventually.eq(false, msg || 'check element is not displayed: ' + this.locator());
+        },
+
         checkMatch(regexp, msg) {
             this.getText().should.eventually.match(regexp, msg || 'check match: ' + this.locator());
+        },
+
+        checkText(text, msg) {
+            this.getText().should.eventually.eq(text, msg || 'check text: ' + this.locator());
         },
 
         checkValue(value, msg) {
