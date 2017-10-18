@@ -36,23 +36,28 @@ class Base {
         });
     };
 
-    setSynch() {
+    setWaitForAngular() {
         return flow.execute(() => {
             browser.waitForAngularEnabled(true);
         });
     };
 
-    setNoSynch() {
+    setNoWaitForAngular() {
         return flow.execute(() => {
             browser.waitForAngularEnabled(false);
         });
     };
 
-    checkSynch() {
+    /**
+     * enable or disable wait for angular for the page
+     *
+     * @requires page to include `angular` boolean variable
+     */
+    checkWaitForAngular() {
         if (this.angular) {
-            this.setSynch();
+            this.setWaitForAngular();
         } else {
-            this.setNoSynch();
+            this.setNoWaitForAngular();
         }
     };
 
@@ -115,7 +120,7 @@ class Base {
      */
     at(timeout) {
         return flow.execute(() => {
-            this.checkSynch();
+            this.checkWaitForAngular();
             this.logTitle();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Page: ' + (this.url || ''));
         });
@@ -128,7 +133,7 @@ class Base {
      */
     atFrame(timeout) {
         return flow.execute(() => {
-            this.checkSynch();
+            this.checkWaitForAngular();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Frame: ${this.iframe}`);
         });
     };
@@ -140,14 +145,14 @@ class Base {
      */
     atUrl(url, timeout) {
         return flow.execute(() => {
-            this.checkSynch();
+            this.checkWaitForAngular();
             this.waitForUrl(url || this.url, timeout);
         });
     };
 
     atUrlContains(url, timeout) {
         return flow.execute(() => {
-            this.checkSynch();
+            this.checkWaitForAngular();
             this.waitForUrlContains(url || this.url, timeout);
         });
     };
@@ -159,14 +164,14 @@ class Base {
      */
     atTitle(title, timeout) {
         return flow.execute(() => {
-            this.checkSynch();
+            this.checkWaitForAngular();
             this.waitForTitle(title || this.title, timeout);
         });
     };
 
     atTitleContains(title, timeout) {
         return flow.execute(() => {
-            this.checkSynch();
+            this.checkWaitForAngular();
             this.waitForTitleContains(title || this.title, timeout);
         });
     };
@@ -179,7 +184,7 @@ class Base {
      */
     goTo() {
         return flow.execute(() => {
-            this.checkSynch();
+            this.checkWaitForAngular();
             this.log(`*goTo: ${config.webserver + this.url}`);
             browser.navigate().to(config.webserver + this.url);
             this.at();
@@ -239,14 +244,14 @@ class Base {
     };
 
     switchToWindow(windowHandleIndex) {
-        this.setNoSynch();
+        this.setNoWaitForAngular();
         return browser.getAllWindowHandles().then((handles) => {
             return browser.switchTo().window(handles[windowHandleIndex]);
         });
     };
 
     switchToDefault() {
-        this.setNoSynch();
+        this.setNoWaitForAngular();
         return flow.execute(() => {
             browser.switchTo().defaultContent().then(
                 () => {}, (err) => {
@@ -258,7 +263,7 @@ class Base {
 
     switchToNew(currentWinHandle) {
         this.pause();
-        this.setNoSynch();
+        this.setNoWaitForAngular();
         return browser.getAllWindowHandles().then((handles) => {
             if (!!currentWinHandle) {
                 return browser.switchTo().window(handles.filter((handle) => {
@@ -272,7 +277,7 @@ class Base {
 
     switchCloseWindow() {
         browser.close();
-        this.setNoSynch();
+        this.setNoWaitForAngular();
         return browser.getAllWindowHandles().then((handles) => {
             return browser.switchTo().window(handles[0]);
         });
@@ -285,7 +290,7 @@ class Base {
             frame.iframe.waitInDom();
             nameOrIndex = frame.iframe.getWebElement();
         }
-        this.setNoSynch();
+        this.setNoWaitForAngular();
         return browser.switchTo().frame(nameOrIndex).then(() => {
             return frame.atFrame();
         });
