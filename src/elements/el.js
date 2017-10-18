@@ -5,12 +5,12 @@
     Object.assign(ElementFinder.prototype, {
 
         waitInDom(timeout) {
-            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, 'wait in dom: ${this.locator()}');
+            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
             return this;
         },
 
         waitNotInDom(timeout) {
-            browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, 'wait not in dom: ${this.locator()}');
+            browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, `wait not in dom: ${this.locator()}`);
             return this;
         },
 
@@ -28,27 +28,27 @@
         },
 
         waitReady(timeout) {
-            browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, 'wait for visible: ${this.locator()}');
+            browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, `wait for visible: ${this.locator()}`);
             return this;
         },
 
         waitInvisible(timeout) {
-            browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, 'wait for invisible: ${this.locator()}');
+            browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, `wait for invisible: ${this.locator()}`);
             return this;
         },
 
         waitClickable(timeout) {
-            browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, 'wait clickable: ${this.locator()}');
+            browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, `wait clickable: ${this.locator()}`);
             return this;
         },
 
         waitForText(text, timeout) {
-            browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, 'wait for text: ${this.locator()}');
+            browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, `wait for text: ${this.locator()}`);
             return this;
         },
 
         waitForValue(value, timeout) {
-            browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, 'wait for value: ${this.locator()}');
+            browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, `wait for value: ${this.locator()}`);
             return this;
         },
 
@@ -62,7 +62,7 @@
 
         hasClass(klass) {
             return this.getAttribute('class').then((classes) => {
-                base.log('class attribute: ${classes}');
+                base.log(`class attribute: ${classes}`);
                 return classes.split(' ').indexOf(klass) !== -1;
             });
         },
@@ -79,7 +79,7 @@
             });
         },
         findByText(searchText) {
-            return this.element(By.xpath('.//*[text()="${searchText}"]'));
+            return this.element(By.xpath(`.//*[text()="${searchText}"]`));
         },
 
         focus() {

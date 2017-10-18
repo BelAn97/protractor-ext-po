@@ -4,7 +4,7 @@
     Object.assign(ElementArrayFinder.prototype, {
 
         waitInDom(timeout) {
-            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, 'wait in dom: ${this.locator()}');
+            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
             return this;
         },
 
@@ -17,8 +17,8 @@
         },
 
         waitReady(timeout) {
-            this.waitDom();
-            browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, 'wait for visible one of: ${this.locator()}');
+            this.waitInDom();
+            browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, `wait for visible one of: ${this.locator()}`);
             return this;
         },
 
@@ -52,21 +52,21 @@
         },
 
         getFirstVisible() {
-            this.waitDisplayedOneOf();
+            this.waitReady();
             return this.filter((el) => {
                 return el.isDisplayed();
             }).first();
         },
 
         getLastVisible() {
-            this.waitDisplayedOneOf();
+            this.waitReady();
             return this.filter((el) => {
                 return el.isDisplayed();
             }).last();
         },
 
         clickAtFirstVisible() {
-            this.waitDisplayedOneOf();
+            this.waitReady();
             return this.filter((el) => {
                 return el.isDisplayed();
             }).first().clickScript();
@@ -115,7 +115,7 @@
         },
 
         getAllByText(text) {
-            return this.all(By.xpath('./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]'));
+            return this.all(By.xpath(`./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]`));
         },
 
         getFirstByText(text) {
@@ -127,7 +127,7 @@
         },
 
         getAllByTextContains(text) {
-            return this.all(By.xpath('./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]'));
+            return this.all(By.xpath(`./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]`));
         },
 
         getFirstByTextContains(text) {
