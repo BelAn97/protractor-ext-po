@@ -46,7 +46,7 @@
         let els = using.querySelectorAll(cssEl);
         // Return an array of elements with the text.
         return Array.prototype.filter.call(els, (el) => {
-            return el.innerHTML.indexOf('>' + text + '<') >= 0;
+            return el.innerHTML.indexOf('>${text}<') >= 0;
         });
     });
 })();

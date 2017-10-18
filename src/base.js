@@ -58,7 +58,7 @@ class Base {
 
     sleep(ms) {
         return flow.execute(() => {
-            // console.log('*sleep: '+ms+'ms');
+            // console.log('*sleep: ${ms} ms');
             browser.sleep(ms);
         });
     };
@@ -77,21 +77,21 @@ class Base {
 
     logTitle() {
         browser.getTitle().then((title) => {
-            this.log('Title: ' + title);
+            this.log('Title: ${title}');
         });
     };
 
     waitForTitle(expected, timeout) {
-        return browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, 'Waiting for title: ' + expected);
+        return browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, 'Waiting for title: ${expected}');
     };
     waitForTitleContains(expected, timeout) {
-        return browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, 'Wait for title contains: ' + expected);
+        return browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, 'Wait for title contains: ${expected}');
     };
     waitForUrl(expected, timeout) {
-        return browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, 'Waiting for url: ' + expected);
+        return browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, 'Waiting for url: ${expected}');
     };
     waitForUrlContains(expected, timeout) {
-        return browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, 'Wait for url contains: ' + expected);
+        return browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, 'Wait for url contains: ${expected}');
     };
     waitForAlert(timeout) {
         return browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, 'Waiting for alert');
@@ -100,12 +100,12 @@ class Base {
     waitFile(filePath, timeout) {
         return browser.wait(() => {
             return fs.existsSync(filePath)
-        }, timeout || this.timeout.xxxl, 'Wait File: ' + filePath);
+        }, timeout || this.timeout.xxxl, 'Wait File: ${filePath}');
     };
     waitFileGone (filePath, timeout) {
         return browser.wait(() => {
             return !fs.existsSync(filePath)
-        }, timeout || this.timeout.xxl, 'Wait File Gone: ' + filePath);
+        }, timeout || this.timeout.xxl, 'Wait File Gone: ${filePath}');
     };
 
     /**
@@ -129,7 +129,7 @@ class Base {
     atFrame(timeout) {
         return flow.execute(() => {
             this.checkSynch();
-            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Frame: ' + this.iframe);
+            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Frame: ${this.iframe}');
         });
     };
 
@@ -180,7 +180,7 @@ class Base {
     goTo() {
         return flow.execute(() => {
             this.checkSynch();
-            this.log('*goTo: ' + config.webserver + this.url);
+            this.log('*goTo: ${config.webserver + this.url}');
             browser.navigate().to(config.webserver + this.url);
             this.at();
         });
@@ -189,7 +189,7 @@ class Base {
     goToUrl(url) {
         return flow.execute(() => {
             url = url || config.webserver + this.url;
-            this.log('*goTo url: ' + url);
+            this.log('*goTo url: ${url}');
             browser.navigate().to(url);
             this.pause();
         });
@@ -197,14 +197,14 @@ class Base {
 
     saveCurrentUrl() {
         browser.getCurrentUrl().then((currentUrl) => {
-            this.log('*save url: ' + currentUrl);
+            this.log('*save url: ${currentUrl}');
             this.savedUrl = currentUrl;
         });
     };
 
     goToSavedUrl() {
         return flow.execute(() => {
-            this.log('*goTo saved url: ' + this.savedUrl);
+            this.log('*goTo saved url: ${this.savedUrl}');
             browser.navigate().to(this.savedUrl);
             this.pause();
         });
@@ -282,7 +282,7 @@ class Base {
         browser.switchTo().defaultContent();
         let frame = this;
         if (!nameOrIndex) {
-            frame.iframe.waitDom();
+            frame.iframe.waitInDom();
             nameOrIndex = frame.iframe.getWebElement();
         }
         this.setNoSynch();

@@ -58,7 +58,7 @@ class Base {
 
     sleep(ms) {
         return flow.execute(() => {
-            // console.log('*sleep: '+ms+'ms');
+            // console.log('*sleep: ${ms} ms');
             browser.sleep(ms);
         });
     };
@@ -77,21 +77,21 @@ class Base {
 
     logTitle() {
         browser.getTitle().then((title) => {
-            this.log('Title: ' + title);
+            this.log('Title: ${title}');
         });
     };
 
     waitForTitle(expected, timeout) {
-        return browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, 'Waiting for title: ' + expected);
+        return browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, 'Waiting for title: ${expected}');
     };
     waitForTitleContains(expected, timeout) {
-        return browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, 'Wait for title contains: ' + expected);
+        return browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, 'Wait for title contains: ${expected}');
     };
     waitForUrl(expected, timeout) {
-        return browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, 'Waiting for url: ' + expected);
+        return browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, 'Waiting for url: ${expected}');
     };
     waitForUrlContains(expected, timeout) {
-        return browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, 'Wait for url contains: ' + expected);
+        return browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, 'Wait for url contains: ${expected}');
     };
     waitForAlert(timeout) {
         return browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, 'Waiting for alert');
@@ -100,12 +100,12 @@ class Base {
     waitFile(filePath, timeout) {
         return browser.wait(() => {
             return fs.existsSync(filePath)
-        }, timeout || this.timeout.xxxl, 'Wait File: ' + filePath);
+        }, timeout || this.timeout.xxxl, 'Wait File: ${filePath}');
     };
     waitFileGone (filePath, timeout) {
         return browser.wait(() => {
             return !fs.existsSync(filePath)
-        }, timeout || this.timeout.xxl, 'Wait File Gone: ' + filePath);
+        }, timeout || this.timeout.xxl, 'Wait File Gone: ${filePath}');
     };
 
     /**
@@ -129,7 +129,7 @@ class Base {
     atFrame(timeout) {
         return flow.execute(() => {
             this.checkSynch();
-            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Frame: ' + this.iframe);
+            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Frame: ${this.iframe}');
         });
     };
 
@@ -180,7 +180,7 @@ class Base {
     goTo() {
         return flow.execute(() => {
             this.checkSynch();
-            this.log('*goTo: ' + config.webserver + this.url);
+            this.log('*goTo: ${config.webserver + this.url}');
             browser.navigate().to(config.webserver + this.url);
             this.at();
         });
@@ -189,7 +189,7 @@ class Base {
     goToUrl(url) {
         return flow.execute(() => {
             url = url || config.webserver + this.url;
-            this.log('*goTo url: ' + url);
+            this.log('*goTo url: ${url}');
             browser.navigate().to(url);
             this.pause();
         });
@@ -197,14 +197,14 @@ class Base {
 
     saveCurrentUrl() {
         browser.getCurrentUrl().then((currentUrl) => {
-            this.log('*save url: ' + currentUrl);
+            this.log('*save url: ${currentUrl}');
             this.savedUrl = currentUrl;
         });
     };
 
     goToSavedUrl() {
         return flow.execute(() => {
-            this.log('*goTo saved url: ' + this.savedUrl);
+            this.log('*goTo saved url: ${this.savedUrl}');
             browser.navigate().to(this.savedUrl);
             this.pause();
         });
@@ -282,7 +282,7 @@ class Base {
         browser.switchTo().defaultContent();
         let frame = this;
         if (!nameOrIndex) {
-            frame.iframe.waitDom();
+            frame.iframe.waitInDom();
             nameOrIndex = frame.iframe.getWebElement();
         }
         this.setNoSynch();
@@ -349,53 +349,53 @@ module.exports = new Base();
     let ElementFinder = $('').constructor;
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
-
+        
         checkButtonEnabled() {
-            this.hasClass('emb-btn-disabled').should.eventually.eq(false, 'check that that button is enabled: ' + this.locator());
+            this.hasClass('emb-btn-disabled').should.eventually.eq(false, 'check that that button is enabled: ${this.locator()}');
         },
 
         checkButtonDisabled() {
-            this.hasClass('emb-btn-disabled').should.eventually.eq(true, 'check that button is disabled: ' + this.locator());
+            this.hasClass('emb-btn-disabled').should.eventually.eq(true, 'check that button is disabled: ${this.locator()}');
         },
 
         checkPresent(msg) {
-            this.isPresent().should.eventually.eq(true, msg || 'check that element is present: ' + this.locator());
+            this.isPresent().should.eventually.eq(true, msg || 'check that element is present: ${this.locator()}');
         },
 
         checkNotPresent(msg) {
-            this.isPresent().should.eventually.eq(false, msg || 'check that element is not present: ' + this.locator());
+            this.isPresent().should.eventually.eq(false, msg || 'check that element is not present: ${this.locator()}');
         },
 
         checkDisplayed(msg) {
-            this.isDisplayed().should.eventually.eq(true, msg || 'check that element is displayed: ' + this.locator());
+            this.isDisplayed().should.eventually.eq(true, msg || 'check that element is displayed: ${this.locator()}');
         },
 
         checkNotDisplayed(msg) {
-            this.isDisplayed().should.eventually.eq(false, msg || 'check that element is not displayed: ' + this.locator());
+            this.isDisplayed().should.eventually.eq(false, msg || 'check that element is not displayed: ${this.locator()}');
         },
 
         checkMatch(regexp, msg) {
-            this.getText().should.eventually.match(regexp, msg || 'check that match: ' + this.locator());
+            this.getText().should.eventually.match(regexp, msg || 'check that match: ${this.locator()}');
         },
 
         checkText(text, msg) {
-            this.getText().should.eventually.eq(text, msg || 'check that text: ' + this.locator());
+            this.getText().should.eventually.eq(text, msg || 'check that text: ${this.locator()}');
         },
 
         checkTextContains(text, msg) {
-            this.getText().should.eventually.contains(text, msg || 'check that text contains: ' + this.locator());
+            this.getText().should.eventually.contains(text, msg || 'check that text contains: ${this.locator()}');
         },
 
         checkValue(value, msg) {
-            this.getValue().should.eventually.eq(value, msg || 'check that value: ' + this.locator());
+            this.getValue().should.eventually.eq(value, msg || 'check that value: ${this.locator()}');
         },
 
         checkHasClass(klass, msg) {
-            this.hasClass(klass).should.eventually.eq(true, msg || 'check that element has the class: ' + this.locator());
+            this.hasClass(klass).should.eventually.eq(true, msg || 'check that element has the class: ${this.locator()}');
         },
 
         checkNotHasClass(klass, msg) {
-            this.hasClass(klass).should.eventually.eq(false, msg || 'check that element does not have the class: ' + this.locator());
+            this.hasClass(klass).should.eventually.eq(false, msg || 'check that element does not have the class: ${this.locator()}');
         },
 
     });
@@ -405,6 +405,54 @@ module.exports = new Base();
     const buffer = require('buffer');
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
+
+        waitInDom(timeout) {
+            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, 'wait in dom: ${this.locator()}');
+            return this;
+        },
+
+        waitNotInDom(timeout) {
+            browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, 'wait not in dom: ${this.locator()}');
+            return this;
+        },
+
+        waitReadyAngular() {
+            if (browser.ignoreSynchronization) {
+                base.setSynch();
+                browser.waitForAngular();
+                base.sleep(base.timeout.min);
+                this.waitReady();
+                base.setNoSynch();
+            } else {
+                this.waitReady();
+            }
+            return this;
+        },
+
+        waitReady(timeout) {
+            browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, 'wait for visible: ${this.locator()}');
+            return this;
+        },
+
+        waitInvisible(timeout) {
+            browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, 'wait for invisible: ${this.locator()}');
+            return this;
+        },
+
+        waitClickable(timeout) {
+            browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, 'wait clickable: ${this.locator()}');
+            return this;
+        },
+
+        waitForText(text, timeout) {
+            browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, 'wait for text: ${this.locator()}');
+            return this;
+        },
+
+        waitForValue(value, timeout) {
+            browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, 'wait for value: ${this.locator()}');
+            return this;
+        },
 
         getParent() {
             return this.element(By.xpath('./..'));
@@ -416,7 +464,7 @@ module.exports = new Base();
 
         hasClass(klass) {
             return this.getAttribute('class').then((classes) => {
-                base.log('class attribute: ' + classes);
+                base.log('class attribute: ${classes}');
                 return classes.split(' ').indexOf(klass) !== -1;
             });
         },
@@ -433,7 +481,7 @@ module.exports = new Base();
             });
         },
         findByText(searchText) {
-            return this.element(By.xpath('.//*[text()="' + searchText + '"]'));
+            return this.element(By.xpath('.//*[text()="${searchText}"]'));
         },
 
         focus() {
@@ -450,55 +498,6 @@ module.exports = new Base();
             return this.focus().clickReady();
         },
 
-        waitDom(timeout) {
-            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, 'wait in dom:' + this.locator());
-            return this;
-        },
-
-        waitNotInDom(timeout) {
-            browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, 'wait not in dom:' + this.locator());
-            return this;
-        },
-
-        waitReadyAngular() {
-            if (browser.ignoreSynchronization) {
-                base.setSynch();
-                browser.waitForAngular();
-                this.waitDom();
-                base.sleep(base.timeout.min);
-                this.waitReady();
-                base.setNoSynch();
-            } else {
-                this.waitReady();
-            }
-            return this;
-        },
-
-        waitReady(timeout) {
-            browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, 'wait for visible:' + this.locator());
-            return this;
-        },
-
-        waitInvisible(timeout) {
-            browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, 'wait for invisible:' + this.locator());
-            return this;
-        },
-
-        waitClickable(timeout) {
-            browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, 'wait clickable:' + this.locator());
-            return this;
-        },
-
-        waitForText(text, timeout) {
-            browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, 'wait for text:' + this.locator());
-            return this;
-        },
-
-        waitForValue(value, timeout) {
-            browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, 'wait for value:' + this.locator());
-            return this;
-        },
-
         clearAndSetText(text) {
             let input = this.waitReady();
             input.clear().sendKeys(text);
@@ -510,7 +509,7 @@ module.exports = new Base();
         },
 
         clickScript() {
-            this.waitDom();
+            this.waitInDom();
             browser.executeScript('arguments[0].click();', this);
             return this;
         },
@@ -604,39 +603,39 @@ module.exports = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
         checkPresent(msg) {
-            this.isPresent().should.eventually.eq(true, msg || 'check that element is present: ' + this.locator());
+            this.isPresent().should.eventually.eq(true, msg || 'check that element is present: ${this.locator()}');
         },
 
         checkNotPresent(msg) {
-            this.isPresent().should.eventually.eq(false, msg || 'check that element is not present: ' + this.locator());
+            this.isPresent().should.eventually.eq(false, msg || 'check that element is not present: ${this.locator()}');
         },
 
         checkDisplayed(msg) {
-            this.isDisplayedOneOf().should.eventually.eq(true, msg || 'check that one of elements is displayed: ' + this.locator());
+            this.isDisplayedOneOf().should.eventually.eq(true, msg || 'check that one of elements is displayed: ${this.locator()}');
         },
 
         checkNotDisplayed(msg) {
-            this.isDisplayedOneOf().should.eventually.eq(false, msg || 'check that all elements are not displayed: ' + this.locator());
+            this.isDisplayedOneOf().should.eventually.eq(false, msg || 'check that all elements are not displayed: ${this.locator()}');
         },
 
         checkListEqual(expectedList, msg) {
-            this.should.eventually.eql(expectedList, msg || 'check that list equal: ' + this.locator());
+            this.should.eventually.eql(expectedList, msg || 'check that list equal: ${this.locator()}');
         },
 
         checkListNotEqual(expectedList, msg) {
-            this.should.not.eventually.eql(expectedList, msg || 'check that list not equal: ' + this.locator());
+            this.should.not.eventually.eql(expectedList, msg || 'check that list not equal: ${this.locator()}');
         },
 
         checkListIncludeMember(member, msg) {
-            this.should.eventually.include(member, msg || 'check that list include the member: ' + this.locator());
+            this.should.eventually.include(member, msg || 'check that list include the member: ${this.locator()}');
         },
 
         checkListIncludeMembers(membersList, msg) {
-            this.should.eventually.include.members(membersList, msg || 'check that list include members: ' + this.locator());
+            this.should.eventually.include.members(membersList, msg || 'check that list include members: ${this.locator()}');
         },
 
         checkListHaveMembers(membersList, msg) {
-            this.should.eventually.have.members(membersList, msg || 'check that list have members: ' + this.locator());
+            this.should.eventually.have.members(membersList, msg || 'check that list have members: ${this.locator()}');
         },
 
         checkTextListEqual(expectedList, msg) {
@@ -660,11 +659,11 @@ module.exports = new Base();
         },
 
         checkListCount(expectedCount, msg) {
-            this.count().should.eventually.eql(expectedCount, msg || 'check that list count: ' + this.locator());
+            this.count().should.eventually.eql(expectedCount, msg || 'check that list count: ${this.locator()}');
         },
 
         checkListMatch(regexp, lowerCase, msg) {
-            this.should.eventually.match(regexp, msg || 'check that list match: ' + this.locator());
+            this.should.eventually.match(regexp, msg || 'check that list match: ${this.locator()}');
         },
 
         checkTextListMatch(regexp, lowerCase, msg) {
@@ -681,6 +680,50 @@ module.exports = new Base();
     let ElementArrayFinder = $$('').constructor;
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
+
+        waitInDom(timeout) {
+            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, 'wait in dom: ${this.locator()}');
+            return this;
+        },
+
+        isDisplayedOneOf() {
+            return this.filter((el) => {
+                return el.isDisplayed();
+            }).count().then((count) => {
+                return count > 0;
+            });
+        },
+
+        waitReady(timeout) {
+            this.waitDom();
+            browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, 'wait for visible one of: ${this.locator()}');
+            return this;
+        },
+
+        waitReadyAngular() {
+            if (browser.ignoreSynchronization) {
+                base.setSynch();
+                browser.waitForAngular();
+                base.sleep(base.timeout.min);
+                this.waitReady();
+                base.setNoSynch();
+            } else {
+                this.waitReady();
+            }
+            return this;
+        },
+
+        waitAllInvisible() {
+            this.filter((el) => {
+                return el.isPresent()
+            }).each((el) => {
+                el.waitInvisible();
+            });
+        },
+
+        waitAllNotInDom() {
+            element(this.locator()).waitNotInDom();
+        },
 
         getParents() {
             return this.all(By.xpath('./..'));
@@ -750,7 +793,7 @@ module.exports = new Base();
         },
 
         getAllByText(text) {
-            return this.all(By.xpath('./..//*[normalize-space(text())="' + text + '" or normalize-space(.)="' + text + '"]'));
+            return this.all(By.xpath('./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]'));
         },
 
         getFirstByText(text) {
@@ -762,7 +805,7 @@ module.exports = new Base();
         },
 
         getAllByTextContains(text) {
-            return this.all(By.xpath('./..//*[contains(normalize-space(text()),"' + text + '") or contains(normalize-space(.),"' + text + '")]'));
+            return this.all(By.xpath('./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]'));
         },
 
         getFirstByTextContains(text) {
@@ -776,37 +819,6 @@ module.exports = new Base();
 
         clickAtLink(text) {
             return this.$$(By.linkText(text)).first().click();
-        },
-
-        isDisplayedOneOf() {
-            return this.filter((el) => {
-                return el.isDisplayed();
-            }).count().then((count) => {
-                return count > 0;
-            });
-        },
-
-        waitReady(timeout) {
-            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, 'wait in dom:' + this.locator());
-            return this;
-        },
-
-        waitDisplayedOneOf(timeout) {
-            browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, 'wait for visible one of:' + this.locator());
-            return this;
-        },
-
-        waitReadyAngular() {
-            if (browser.ignoreSynchronization) {
-                base.setSynch();
-                browser.waitForAngular();
-                base.sleep(base.timeout.min);
-                this.waitReady();
-                base.setNoSynch();
-            } else {
-                this.waitReady();
-            }
-            return this;
         },
 
         getReadyFirst() {
@@ -824,31 +836,19 @@ module.exports = new Base();
             return this.get(index).waitReady();
         },
 
-        waitAllInvisible() {
-            this.filter((el) => {
-                return el.isPresent()
-            }).each((el) => {
-                el.waitInvisible();
-            });
-        },
-
-        waitAllNotInDom() {
-            element(this.locator()).waitNotInDom();
-        },
-
-        checkSortAscending(limit) {
+        checkSortAscending(lowerCase, limit) {
             this.getTextListLimit(limit).then((unSorted) => {
                 unSorted = unSorted.filter(Boolean);
                 let sorted = unSorted.slice();
-                sorted = sorted.sort(base.compareLCase);
+                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
                 sorted.should.deep.equal(unSorted, 'check Ascending');
             });
         },
-        checkSortDescending (limit) {
+        checkSortDescending (lowerCase, limit) {
             this.getTextListLimit(limit).then((unSorted) => {
                 unSorted = unSorted.filter(Boolean);
                 let sorted = unSorted.slice();
-                sorted = sorted.sort(base.compareLCase);
+                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
                 sorted.reverse().should.deep.equal(unSorted, 'check Descending');
             });
         },
@@ -940,7 +940,7 @@ module.exports = new Base();
         let els = using.querySelectorAll(cssEl);
         // Return an array of elements with the text.
         return Array.prototype.filter.call(els, (el) => {
-            return el.innerHTML.indexOf('>' + text + '<') >= 0;
+            return el.innerHTML.indexOf('>${text}<') >= 0;
         });
     });
 })();

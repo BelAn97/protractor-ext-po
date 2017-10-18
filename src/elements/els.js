@@ -3,6 +3,50 @@
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
+        waitInDom(timeout) {
+            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, 'wait in dom: ${this.locator()}');
+            return this;
+        },
+
+        isDisplayedOneOf() {
+            return this.filter((el) => {
+                return el.isDisplayed();
+            }).count().then((count) => {
+                return count > 0;
+            });
+        },
+
+        waitReady(timeout) {
+            this.waitDom();
+            browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, 'wait for visible one of: ${this.locator()}');
+            return this;
+        },
+
+        waitReadyAngular() {
+            if (browser.ignoreSynchronization) {
+                base.setSynch();
+                browser.waitForAngular();
+                base.sleep(base.timeout.min);
+                this.waitReady();
+                base.setNoSynch();
+            } else {
+                this.waitReady();
+            }
+            return this;
+        },
+
+        waitAllInvisible() {
+            this.filter((el) => {
+                return el.isPresent()
+            }).each((el) => {
+                el.waitInvisible();
+            });
+        },
+
+        waitAllNotInDom() {
+            element(this.locator()).waitNotInDom();
+        },
+
         getParents() {
             return this.all(By.xpath('./..'));
         },
@@ -71,7 +115,7 @@
         },
 
         getAllByText(text) {
-            return this.all(By.xpath('./..//*[normalize-space(text())="' + text + '" or normalize-space(.)="' + text + '"]'));
+            return this.all(By.xpath('./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]'));
         },
 
         getFirstByText(text) {
@@ -83,7 +127,7 @@
         },
 
         getAllByTextContains(text) {
-            return this.all(By.xpath('./..//*[contains(normalize-space(text()),"' + text + '") or contains(normalize-space(.),"' + text + '")]'));
+            return this.all(By.xpath('./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]'));
         },
 
         getFirstByTextContains(text) {
@@ -97,37 +141,6 @@
 
         clickAtLink(text) {
             return this.$$(By.linkText(text)).first().click();
-        },
-
-        isDisplayedOneOf() {
-            return this.filter((el) => {
-                return el.isDisplayed();
-            }).count().then((count) => {
-                return count > 0;
-            });
-        },
-
-        waitReady(timeout) {
-            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, 'wait in dom:' + this.locator());
-            return this;
-        },
-
-        waitDisplayedOneOf(timeout) {
-            browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, 'wait for visible one of:' + this.locator());
-            return this;
-        },
-
-        waitReadyAngular() {
-            if (browser.ignoreSynchronization) {
-                base.setSynch();
-                browser.waitForAngular();
-                base.sleep(base.timeout.min);
-                this.waitReady();
-                base.setNoSynch();
-            } else {
-                this.waitReady();
-            }
-            return this;
         },
 
         getReadyFirst() {
@@ -145,31 +158,19 @@
             return this.get(index).waitReady();
         },
 
-        waitAllInvisible() {
-            this.filter((el) => {
-                return el.isPresent()
-            }).each((el) => {
-                el.waitInvisible();
-            });
-        },
-
-        waitAllNotInDom() {
-            element(this.locator()).waitNotInDom();
-        },
-
-        checkSortAscending(limit) {
+        checkSortAscending(lowerCase, limit) {
             this.getTextListLimit(limit).then((unSorted) => {
                 unSorted = unSorted.filter(Boolean);
                 let sorted = unSorted.slice();
-                sorted = sorted.sort(base.compareLCase);
+                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
                 sorted.should.deep.equal(unSorted, 'check Ascending');
             });
         },
-        checkSortDescending (limit) {
+        checkSortDescending (lowerCase, limit) {
             this.getTextListLimit(limit).then((unSorted) => {
                 unSorted = unSorted.filter(Boolean);
                 let sorted = unSorted.slice();
-                sorted = sorted.sort(base.compareLCase);
+                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
                 sorted.reverse().should.deep.equal(unSorted, 'check Descending');
             });
         },
