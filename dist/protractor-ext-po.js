@@ -299,19 +299,19 @@ class Base {
     /**
      * WebDriver actions.
      */
-    static hitReturn() {
+    hitReturn() {
         browser.actions().sendKeys(protractor.Key.ENTER).perform();
     };
 
-    static hitSpace() {
+    hitSpace() {
         browser.actions().sendKeys(protractor.Key.SPACE).perform();
     };
 
-    static hitTab() {
+    hitTab() {
         browser.actions().sendKeys(protractor.Key.TAB).perform();
     };
 
-    static hitEscape() {
+    hitEscape() {
         browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
     };
 
@@ -339,11 +339,11 @@ class Base {
         );
     };
 
-    static compareLowerCase(a, b) {
+    compareLowerCase(a, b) {
         return a.toLowerCase().localeCompare(b.toLowerCase());
     };
 
-    static sortFloat(a, b) {
+    sortFloat(a, b) {
         return a - b;
     };
 
