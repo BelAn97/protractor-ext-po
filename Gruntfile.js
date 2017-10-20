@@ -1,7 +1,6 @@
 module.exports = function(grunt) {
 
-  'use strict';
-
+  grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.initConfig({
 
     concat: {
@@ -13,7 +12,22 @@ module.exports = function(grunt) {
           dest: 'dist/protractor-ext-po.js'
         }]
       }
-    }
+    },
+      protractor: {
+          options: {
+              configFile: 'test/protractor-conf.js', // Default config file
+              noColor: false // If true, protractor will not use colors in its output.
+          },
+          test: {
+              options: {
+                  args: {
+                      specs: [
+                          'test/e2e/tests/**/*.js'
+                      ]
+                  }
+              }
+          }
+      }
   });
 
   // Load grunt tasks automatically
@@ -22,4 +36,5 @@ module.exports = function(grunt) {
   grunt.registerTask('compile', [
     'concat'
   ]);
+  grunt.registerTask('test', 'protractor:test');
 };

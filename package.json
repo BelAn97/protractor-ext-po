@@ -1,6 +1,6 @@
 {
   "name": "protractor-ext-po",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Extension for work with protractor page objects",
   "main": "dist/protractor-ext-po.js",
   "keywords": [
@@ -29,8 +29,12 @@
     "grunt-release": "~0.6.1",
     "load-grunt-tasks": "~0.4.0",
     "path-is-absolute": "^1.0.0",
-    "protractor": "^5.1.2",
-    "wnpm-ci": "latest"
+    "protractor": "^5.2.0",
+    "wnpm-ci": "latest",
+    "grunt-protractor-runner": "^5.0.0",
+    "deasync": "^0.1.10",
+    "mocha": "^4.0.1",
+    "mochawesome-screenshots": "^1.5.3"
   },
   "author": "Andrei Belousov",
   "license": "MIT",

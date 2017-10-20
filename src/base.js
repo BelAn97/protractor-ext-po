@@ -10,7 +10,7 @@ global.flow = protractor.promise.controlFlow();
 
 class Base {
 
-    constructor(domain){
+    constructor(){
         /**
          * wrap timeout. (ms) in t-shirt sizes
          */
@@ -26,9 +26,20 @@ class Base {
             'max': 900000
         };
         this.EC = browser.ExpectedConditions;
-        this.domain = domain;
+        this.domain = '';
+        this.download = '';
         this.savedUrl = '';
     }
+
+    setDomain(domain) {
+        this.log(`*set domain: ${domain}`);
+        this.domain = domain;
+    };
+
+    setDownload(download) {
+        this.log(`*set download path: ${download}`);
+        this.download = download;
+    };
 
     debug() {
         return flow.execute(() => {
@@ -185,15 +196,15 @@ class Base {
     goTo() {
         return flow.execute(() => {
             this.checkWaitForAngular();
-            this.log(`*goTo: ${config.webserver + this.url}`);
-            browser.navigate().to(config.webserver + this.url);
+            this.log(`*goTo: ${base.domain + this.url}`);
+            browser.navigate().to(base.domain + this.url);
             this.at();
         });
     };
 
     goToUrl(url) {
         return flow.execute(() => {
-            url = url || config.webserver + this.url;
+            url = url || base.domain + this.url;
             this.log(`*goTo url: ${url}`);
             browser.navigate().to(url);
             this.pause();
