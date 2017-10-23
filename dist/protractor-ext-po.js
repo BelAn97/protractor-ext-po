@@ -496,6 +496,7 @@ module.exports = new Base();
                 return size.width;
             });
         },
+
         findByText(searchText) {
             return this.element(By.xpath(`.//*[text()="${searchText}"]`));
         },
@@ -517,6 +518,15 @@ module.exports = new Base();
         clearAndSetText(text) {
             let input = this.waitReady();
             input.clear().sendKeys(text);
+            return this;
+        },
+
+        sendKeysSlow(text) {
+            let input = this.waitReady();
+            text.split('').forEach(function (char) {
+                input.sendKeys(char);
+                base.sleep(base.timeout.min);
+            });
             return this;
         },
 
