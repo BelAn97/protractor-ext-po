@@ -19,26 +19,6 @@
             this.isDisplayedOneOf().should.eventually.eq(false, msg || `check that all elements are not displayed: ${this.locator()}`);
         },
 
-        checkListEqual(expectedList, msg) {
-            this.should.eventually.eql(expectedList, msg || `check that list equal: ${this.locator()}`);
-        },
-
-        checkListNotEqual(expectedList, msg) {
-            this.should.not.eventually.eql(expectedList, msg || `check that list not equal: ${this.locator()}`);
-        },
-
-        checkListIncludeMember(member, msg) {
-            this.should.eventually.include(member, msg || `check that list include the member: ${this.locator()}`);
-        },
-
-        checkListIncludeMembers(membersList, msg) {
-            this.should.eventually.include.members(membersList, msg || `check that list include members: ${this.locator()}`);
-        },
-
-        checkListHaveMembers(membersList, msg) {
-            this.should.eventually.have.members(membersList, msg || `check that list have members: ${this.locator()}`);
-        },
-
         checkTextListEqual(expectedList, msg) {
             this.getTextList().should.eventually.eql(expectedList, msg || `check that text list equal: ${this.locator()}`);
         },
@@ -63,11 +43,7 @@
             this.count().should.eventually.eql(expectedCount, msg || `check that list count: ${this.locator()}`);
         },
 
-        checkListMatch(regexp, msg) {
-            this.should.eventually.match(regexp, msg || `check that list match: ${this.locator()}`);
-        },
-
-        checkTextListMatch(regexp, lowerCase, msg) {
+        checkTextListMatch(regexp, msg, lowerCase) {
             if (lowerCase) {
                 this.getTextListLowerCase().should.eventually.match(regexp, msg || `check that text list match: ${this.locator()}`);
             } else {
