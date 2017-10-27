@@ -51,20 +51,20 @@
             }
         },
 
-        checkSortAscending(lowerCase, limit) {
+        checkSortAscending(compareFn, limit) {
             this.getTextListLimit(limit).then((unSorted) => {
                 unSorted = unSorted.filter(Boolean);
                 let sorted = unSorted.slice();
-                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
+                sorted = compareFn ? sorted.sort(compareFn) : sorted.sort();
                 sorted.should.deep.equal(unSorted, 'check Ascending');
             });
         },
 
-        checkSortDescending (lowerCase, limit) {
+        checkSortDescending(compareFn, limit) {
             this.getTextListLimit(limit).then((unSorted) => {
                 unSorted = unSorted.filter(Boolean);
                 let sorted = unSorted.slice();
-                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
+                sorted = compareFn ? sorted.sort(compareFn) : sorted.sort();
                 sorted.reverse().should.deep.equal(unSorted, 'check Descending');
             });
         }
