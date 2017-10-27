@@ -49,6 +49,24 @@
             } else {
                 this.getTextList().should.eventually.match(regexp, msg || `check that text list match: ${this.locator()}`);
             }
+        },
+
+        checkSortAscending(lowerCase, limit) {
+            this.getTextListLimit(limit).then((unSorted) => {
+                unSorted = unSorted.filter(Boolean);
+                let sorted = unSorted.slice();
+                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
+                sorted.should.deep.equal(unSorted, 'check Ascending');
+            });
+        },
+
+        checkSortDescending (lowerCase, limit) {
+            this.getTextListLimit(limit).then((unSorted) => {
+                unSorted = unSorted.filter(Boolean);
+                let sorted = unSorted.slice();
+                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
+                sorted.reverse().should.deep.equal(unSorted, 'check Descending');
+            });
         }
 
     });

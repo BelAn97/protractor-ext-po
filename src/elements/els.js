@@ -156,24 +156,7 @@
         getReadyByIndex(index) {
             this.waitReady();
             return this.get(index).waitReady();
-        },
-
-        checkSortAscending(lowerCase, limit) {
-            this.getTextListLimit(limit).then((unSorted) => {
-                unSorted = unSorted.filter(Boolean);
-                let sorted = unSorted.slice();
-                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
-                sorted.should.deep.equal(unSorted, 'check Ascending');
-            });
-        },
-        checkSortDescending (lowerCase, limit) {
-            this.getTextListLimit(limit).then((unSorted) => {
-                unSorted = unSorted.filter(Boolean);
-                let sorted = unSorted.slice();
-                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
-                sorted.reverse().should.deep.equal(unSorted, 'check Descending');
-            });
-        },
+        }
 
     });
 })();
