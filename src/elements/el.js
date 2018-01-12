@@ -150,7 +150,7 @@
         pasteFromClipboard(value) {
             this.clickReady();
             buffer.copy(value);
-            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.CONTROL, 'v')).perform();
+            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
             return this;
         },
 

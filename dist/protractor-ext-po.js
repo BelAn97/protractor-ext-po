@@ -398,8 +398,16 @@ module.exports = new Base();
             this.getText().should.eventually.eq(text, msg || `check that text: ${this.locator()}`);
         },
 
+        checkTextNotEqual(text, msg) {
+            this.getText().should.eventually.not.eq(text, msg || `check that text not equal: ${this.locator()}`);
+        },
+
         checkTextContains(text, msg) {
             this.getText().should.eventually.contains(text, msg || `check that text contains: ${this.locator()}`);
+        },
+
+        checkTextNotContains(text, msg) {
+            this.getText().should.eventually.not.contains(text, msg || `check that text not contains: ${this.locator()}`);
         },
 
         checkValue(value, msg) {
@@ -568,7 +576,7 @@ module.exports = new Base();
         pasteFromClipboard(value) {
             this.clickReady();
             buffer.copy(value);
-            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.CONTROL, 'v')).perform();
+            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
             return this;
         },
 
@@ -674,6 +682,24 @@ module.exports = new Base();
             } else {
                 this.getTextList().should.eventually.match(regexp, msg || `check that text list match: ${this.locator()}`);
             }
+        },
+
+        checkSortAscending(compareFn, limit) {
+            this.getTextListLimit(limit).then((unSorted) => {
+                unSorted = unSorted.filter(Boolean);
+                let sorted = unSorted.slice();
+                sorted = compareFn ? sorted.sort(compareFn) : sorted.sort();
+                sorted.should.deep.equal(unSorted, 'check Ascending');
+            });
+        },
+
+        checkSortDescending(compareFn, limit) {
+            this.getTextListLimit(limit).then((unSorted) => {
+                unSorted = unSorted.filter(Boolean);
+                let sorted = unSorted.slice();
+                sorted = compareFn ? sorted.sort(compareFn) : sorted.sort();
+                sorted.reverse().should.deep.equal(unSorted, 'check Descending');
+            });
         }
 
     });
@@ -836,24 +862,7 @@ module.exports = new Base();
         getReadyByIndex(index) {
             this.waitReady();
             return this.get(index).waitReady();
-        },
-
-        checkSortAscending(lowerCase, limit) {
-            this.getTextListLimit(limit).then((unSorted) => {
-                unSorted = unSorted.filter(Boolean);
-                let sorted = unSorted.slice();
-                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
-                sorted.should.deep.equal(unSorted, 'check Ascending');
-            });
-        },
-        checkSortDescending (lowerCase, limit) {
-            this.getTextListLimit(limit).then((unSorted) => {
-                unSorted = unSorted.filter(Boolean);
-                let sorted = unSorted.slice();
-                sorted = lowerCase ? sorted.sort(base.compareLowerCase) : sorted.sort();
-                sorted.reverse().should.deep.equal(unSorted, 'check Descending');
-            });
-        },
+        }
 
     });
 })();
