@@ -1,6 +1,6 @@
 {
   "name": "protractor-ext-po",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Extension for work with protractor page objects",
   "main": "dist/protractor-ext-po.js",
   "keywords": [
@@ -34,7 +34,9 @@
     "grunt-protractor-runner": "^5.0.0",
     "deasync": "^0.1.10",
     "mocha": "^4.0.1",
-    "mochawesome-screenshots": "^1.5.3"
+    "mochawesome-screenshots": "^1.5.9",
+    "mocha-multi-reporters": "^1.1.7",
+    "mocha-reportportal-agent": "^0.0.15"
   },
   "author": "Andrei Belousov",
   "license": "MIT",
