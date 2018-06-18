@@ -2,14 +2,6 @@
     let ElementFinder = $('').constructor;
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
-        
-        checkButtonEnabled() {
-            this.hasClass('emb-btn-disabled').should.eventually.eq(false, `check that that button is enabled: ${this.locator()}`);
-        },
-
-        checkButtonDisabled() {
-            this.hasClass('emb-btn-disabled').should.eventually.eq(true, `check that button is disabled: ${this.locator()}`);
-        },
 
         checkPresent(msg) {
             this.isPresent().should.eventually.eq(true, msg || `check that element is present: ${this.locator()}`);

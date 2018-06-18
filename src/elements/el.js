@@ -148,10 +148,14 @@
         },
 
         pasteFromClipboard(value) {
-            this.clickReady();
-            buffer.copy(value);
-            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
-            return this;
+            var self = this;
+            flow.execute(function () {
+                buffer.copy(value, function() {
+                    self.clickReady();
+                    base.sleep(base.timeout.min);
+                    browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
+                });
+            });
         },
 
         pressEnter() {

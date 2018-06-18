@@ -42,19 +42,19 @@ class Base {
     };
 
     debug() {
-        return flow.execute(() => {
+        flow.execute(() => {
             console.log('debug');
         });
     };
 
     setWaitForAngular() {
-        return flow.execute(() => {
+        flow.execute(() => {
             browser.waitForAngularEnabled(true);
         });
     };
 
     setNoWaitForAngular() {
-        return flow.execute(() => {
+        flow.execute(() => {
             browser.waitForAngularEnabled(false);
         });
     };
@@ -73,7 +73,7 @@ class Base {
     };
 
     sleep(ms) {
-        return flow.execute(() => {
+        flow.execute(() => {
             // console.log(`*sleep: ${ms} ms`);
             browser.sleep(ms);
         });
@@ -85,7 +85,7 @@ class Base {
 
     log(value) {
         if (!!value) {
-            return flow.execute(() => {
+            flow.execute(() => {
                 console.log(value);
             });
         }
@@ -130,7 +130,7 @@ class Base {
      * @requires page to include `loaded` webElement
      */
     at(timeout) {
-        return flow.execute(() => {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.logTitle();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Page: ' + (this.url || ''));
@@ -143,7 +143,7 @@ class Base {
      * @requires page to include `loaded` webElement
      */
     atFrame(timeout) {
-        return flow.execute(() => {
+        flow.execute(() => {
             this.checkWaitForAngular();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Frame: ${this.iframe}`);
         });
@@ -155,14 +155,14 @@ class Base {
      * @requires page to include `url` variable
      */
     atUrl(url, timeout) {
-        return flow.execute(() => {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForUrl(url || this.url, timeout);
         });
     };
 
     atUrlContains(url, timeout) {
-        return flow.execute(() => {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForUrlContains(url || this.url, timeout);
         });
@@ -174,14 +174,14 @@ class Base {
      * @requires page to include `title` variable
      */
     atTitle(title, timeout) {
-        return flow.execute(() => {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForTitle(title || this.title, timeout);
         });
     };
 
     atTitleContains(title, timeout) {
-        return flow.execute(() => {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForTitleContains(title || this.title, timeout);
         });
@@ -194,7 +194,7 @@ class Base {
      * @requires page have both `url` and `loaded` properties
      */
     goTo() {
-        return flow.execute(() => {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.log(`*goTo: ${base.domain + this.url}`);
             browser.navigate().to(base.domain + this.url);
@@ -203,7 +203,7 @@ class Base {
     };
 
     goToUrl(url) {
-        return flow.execute(() => {
+        flow.execute(() => {
             url = url || base.domain + this.url;
             this.log(`*goTo url: ${url}`);
             browser.navigate().to(url);
@@ -219,7 +219,7 @@ class Base {
     };
 
     goToSavedUrl() {
-        return flow.execute(() => {
+        flow.execute(() => {
             this.log(`*goTo saved url: ${this.savedUrl}`);
             browser.navigate().to(this.savedUrl);
             this.pause();
@@ -238,7 +238,7 @@ class Base {
 
     goBack() {
         this.log('*goBack');
-        return flow.execute(() => {
+        flow.execute(() => {
             this.pause();
             browser.navigate().back();
             this.pause();
@@ -247,7 +247,7 @@ class Base {
 
     goForward() {
         this.log('*goForward');
-        return flow.execute(() => {
+        flow.execute(() => {
             this.pause();
             browser.navigate().forward();
             this.pause();
@@ -263,7 +263,7 @@ class Base {
 
     switchToDefault() {
         this.setNoWaitForAngular();
-        return flow.execute(() => {
+        flow.execute(() => {
             browser.switchTo().defaultContent().then(
                 () => {}, (err) => {
                     console.log(err);
@@ -365,14 +365,6 @@ module.exports = new Base();
     let ElementFinder = $('').constructor;
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
-        
-        checkButtonEnabled() {
-            this.hasClass('emb-btn-disabled').should.eventually.eq(false, `check that that button is enabled: ${this.locator()}`);
-        },
-
-        checkButtonDisabled() {
-            this.hasClass('emb-btn-disabled').should.eventually.eq(true, `check that button is disabled: ${this.locator()}`);
-        },
 
         checkPresent(msg) {
             this.isPresent().should.eventually.eq(true, msg || `check that element is present: ${this.locator()}`);
@@ -574,10 +566,14 @@ module.exports = new Base();
         },
 
         pasteFromClipboard(value) {
-            this.clickReady();
-            buffer.copy(value);
-            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
-            return this;
+            var self = this;
+            flow.execute(function () {
+                buffer.copy(value, function() {
+                    self.clickReady();
+                    base.sleep(base.timeout.min);
+                    browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
+                });
+            });
         },
 
         pressEnter() {
