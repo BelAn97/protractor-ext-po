@@ -39,10 +39,10 @@ exports.config = {
         reporterOptions: {
             reporterEnabled: 'mocha-reportportal-agent, mochawesome-screenshots',
             mochaReportportalAgentReporterOptions: {
-                token: "64f61a65-fb9d-4fcf-b825-3a0d4e4a757d",
+                token: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
                 endpoint: "https://rp.epam.com/api/v1",
                 launch: 'Angular site e2e tests report - /chrome/',
-                project: "andrei_belousov_personal",
+                project: "xxx_personal",
                 debug: true
             },
             mochawesomeScreenshotsReporterOptions: {
