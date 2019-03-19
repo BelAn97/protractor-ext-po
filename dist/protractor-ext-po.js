@@ -1,5 +1,5 @@
+require('protractor');
 const fs = require('fs');
-
 const chai = require('chai');
 const chaiThings = require('chai-things');
 const chaiAsPromised = require('chai-as-promised');
@@ -15,6 +15,7 @@ class Base {
          * wrap timeout. (ms) in t-shirt sizes
          */
         this.timeout = {
+            'zero': 50,
             'min': 200,
             'xs': 500,
             's': 1000,
@@ -65,16 +66,18 @@ class Base {
      * @requires page to include `angular` boolean variable
      */
     checkWaitForAngular() {
-        if (this.angular) {
-            this.setWaitForAngular();
-        } else {
-            this.setNoWaitForAngular();
+        if (this.angular !== undefined) {
+            if (this.angular) {
+                this.setWaitForAngular();
+            } else {
+                this.setNoWaitForAngular();
+            }
         }
     };
 
     sleep(ms) {
         flow.execute(() => {
-            // console.log(`*sleep: ${ms} ms`);
+            console.log(`*sleep: ${ms} ms`);
             browser.sleep(ms);
         });
     };
@@ -211,6 +214,13 @@ class Base {
         });
     };
 
+    goToPath(path) {
+        flow.execute(() => {
+            this.log('*goTo path: ' + base.domain + path);
+            browser.get(base.domain + path);
+        });
+    };
+
     saveCurrentUrl() {
         browser.getCurrentUrl().then((currentUrl) => {
             this.log(`*save url: ${currentUrl}`);
@@ -234,6 +244,14 @@ class Base {
     refresh() {
         this.log('*refresh');
         browser.refresh();
+    };
+
+    resetSession() {
+        this.log('*resetSession');
+        return browser.driver.manage().deleteAllCookies().then(() => {
+            browser.executeScript('window.localStorage.clear(); window.sessionStorage.clear();');
+            browser.refresh();
+        })
     };
 
     goBack() {
@@ -272,6 +290,26 @@ class Base {
         });
     };
 
+    switchToDefaultState() {
+        this.setNoWaitForAngular();
+        flow.execute(() =>  {
+            browser.switchTo().defaultContent().then(() => {
+                    browser.getAllWindowHandles().then((handles) => {
+                        for (let i=1; i<handles.length; i++) {
+                            browser.switchTo().window(handles[i]);
+                            browser.close();
+                        }
+                    });
+                },
+                (err) => {
+                    console.log(err);
+                    browser.restart();
+                    browser.switchTo().activeElement();
+                }
+            );
+        });
+    };
+
     switchToNew(currentWinHandle) {
         this.pause();
         this.setNoWaitForAngular();
@@ -296,14 +334,13 @@ class Base {
 
     switchToFrame(nameOrIndex) {
         browser.switchTo().defaultContent();
-        let frame = this;
         if (!nameOrIndex) {
-            frame.iframe.waitInDom();
-            nameOrIndex = frame.iframe.getWebElement();
+            this.iframe.waitInDom();
+            nameOrIndex = this.iframe.getWebElement();
         }
         this.setNoWaitForAngular();
         return browser.switchTo().frame(nameOrIndex).then(() => {
-            return frame.atFrame();
+            return this.atFrame();
         });
     };
 
@@ -329,15 +366,25 @@ class Base {
     /**
      * WebDriver alerts.
      */
+    isAlertPresent() {
+        return browser.getTitle().then(
+            () => {
+                return false;
+            }, () => {
+                return true;
+            }
+        );
+    };
+
     acceptAlert() {
-        browser.getTitle().then((title) => {}, (err) => {
+        if (base.isAlertPresent()) {
             browser.switchTo().alert().then((alert) => {
                     this.log("Accept alert");
                     alert.accept();
                 }, (err) => {
                 }
             );
-        });
+        }
     };
 
     checkAlert(message) {
@@ -350,12 +397,34 @@ class Base {
         );
     };
 
-    compareLowerCase(a, b) {
+    getSplitArray(arr, char){
+        return [].concat(arr).map((el) => {
+            return el.split(char)[0].trim();
+        });
+    };
+
+    getSplitArrayMulti (arr, chars){
+        return [].concat(arr).map((el) => {
+            chars.forEach((char) => {
+                el = el.split(char)[0];
+            });
+            return el.trim();
+        });
+    };
+
+    /**
+     * comparators.
+     */
+    static compareLowerCase(a, b) {
         return a.toLowerCase().localeCompare(b.toLowerCase());
     };
 
-    sortFloat(a, b) {
-        return a - b;
+    static compareFloat(a, b) {
+        return parseFloat(a) - parseFloat(b);
+    };
+
+    static comparePercentage(a, b) {
+        return parseFloat(a.replace('%', '')) - parseFloat(b.replace('%', ''));
     };
 
 }
@@ -418,7 +487,8 @@ module.exports = new Base();
 })();
 (function () {
     let ElementFinder = $('').constructor;
-    const buffer = require('buffer');
+    const buffer = require('copy-paste');
+    const _ = require('underscore');
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
 
@@ -429,19 +499,6 @@ module.exports = new Base();
 
         waitNotInDom(timeout) {
             browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, `wait not in dom: ${this.locator()}`);
-            return this;
-        },
-
-        waitReadyAngular() {
-            if (browser.ignoreSynchronization) {
-                base.setSynch();
-                browser.waitForAngular();
-                base.sleep(base.timeout.min);
-                this.waitReady();
-                base.setNoSynch();
-            } else {
-                this.waitReady();
-            }
             return this;
         },
 
@@ -521,11 +578,11 @@ module.exports = new Base();
             return this;
         },
 
-        sendKeysSlow(text) {
+        sendKeysSlow(text, interval) {
             let input = this.waitReady();
-            text.split('').forEach(function (char) {
+            text.split('').forEach((char) => {
                 input.sendKeys(char);
-                base.sleep(base.timeout.min);
+                base.sleep(interval || base.timeout.zero);
             });
             return this;
         },
@@ -534,13 +591,13 @@ module.exports = new Base();
             return this.waitClickable().click();
         },
 
-        clickScript() {
+        clickByScript() {
             this.waitInDom();
             browser.executeScript('arguments[0].click();', this);
             return this;
         },
 
-        clickCenter() {
+        clickByCenter() {
             this.waitReady();
             browser.actions().click(this).perform();
             return this;
@@ -553,12 +610,11 @@ module.exports = new Base();
         },
 
         clickIfExists() {
-            let self = this;
             this.isPresent().then((val) => {
                 if (val) {
-                    self.isDisplayed().then((val) => {
+                    this.isDisplayed().then((val) => {
                         if (val) {
-                            self.click();
+                            this.click();
                         }
                     });
                 }
@@ -566,14 +622,10 @@ module.exports = new Base();
         },
 
         pasteFromClipboard(value) {
-            var self = this;
-            flow.execute(function () {
-                buffer.copy(value, function() {
-                    self.clickReady();
-                    base.sleep(base.timeout.min);
-                    browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
-                });
-            });
+            buffer.copy(value);
+            this.clickReady();
+            base.sleep(base.timeout.min);
+            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
         },
 
         pressEnter() {
@@ -586,9 +638,42 @@ module.exports = new Base();
             return this;
         },
 
+        pressTab() {
+            browser.actions().sendKeys(protractor.Key.TAB).perform();
+            return this;
+        },
+
+        pressUp() {
+            browser.actions().sendKeys(protractor.Key.UP).perform();
+            return this;
+        },
+
+        pressDown() {
+            browser.actions().sendKeys(protractor.Key.DOWN).perform();
+            return this;
+        },
+        
         getTextReady() {
             return this.waitReady().getText();
         },
+
+        scrollAndGetTextList(list, scrolledElements, scrollCount) {
+            browser.executeScript('arguments[0].scrollIntoView(false);', scrolledPanel);
+            return this.getTextList().then((newList) => {
+                if (scrollCount > 0) {
+                    return this.scrollAndGetTextList(_.union(list, newList), scrolledElements, scrollCount - 1);
+                } else {
+                    return _.union(list, newList);
+                }
+            });
+        },
+
+        getTextListAtScrolled(scrolledElements, scrollCount) {
+            return scrolledElements.getTextList().then((list) => {
+                return this.scrollAndGetTextList(list, scrolledElements, scrollCount)
+            });
+
+        }
 
     });
 })();
@@ -718,22 +803,17 @@ module.exports = new Base();
             });
         },
 
+        isPresentOneOf() {
+            return this.filter((el) => {
+                return el.isPresent();
+            }).count().then((count) => {
+                return count > 0;
+            });
+        },
+
         waitReady(timeout) {
             this.waitInDom();
             browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, `wait for visible one of: ${this.locator()}`);
-            return this;
-        },
-
-        waitReadyAngular() {
-            if (browser.ignoreSynchronization) {
-                base.setSynch();
-                browser.waitForAngular();
-                base.sleep(base.timeout.min);
-                this.waitReady();
-                base.setNoSynch();
-            } else {
-                this.waitReady();
-            }
             return this;
         },
 
@@ -747,6 +827,12 @@ module.exports = new Base();
 
         waitAllNotInDom() {
             element(this.locator()).waitNotInDom();
+        },
+
+        slice(begin, end) {
+            return this.then((elements) => {
+                return elements.slice(begin, end);
+            });
         },
 
         getParents() {
@@ -768,25 +854,26 @@ module.exports = new Base();
         },
 
         clickAtFirstVisible() {
-            this.waitReady();
-            return this.filter((el) => {
-                return el.isDisplayed();
-            }).first().clickScript();
+            this.getFirstVisible().click();
         },
 
-        getTextList() {
+        clickAtLastVisible() {
+            this.getLastVisible().click();
+        },
+
+        getTextList(trim) {
             return this.map((elm) => {
                 return elm.getText().then((val) => {
-                    return val.trim();
+                    return trim ? val.trim() : val;
                 });
             });
         },
 
-        getTextListLimit(limit) {
-            return this.map(function (elm, i) {
+        getTextListLimit(limit, trim) {
+            return this.map((elm, i) => {
                 if (!limit || i<limit) {
-                    return elm.getText().then(function (val) {
-                        return val.trim();
+                    return elm.getText().then((val) => {
+                        return trim ? val.trim() : val;
                     });
                 }
             });
@@ -840,9 +927,8 @@ module.exports = new Base();
             return this.getAllByTextContains(text).clickAtFirstVisible();
         },
 
-
         clickAtLink(text) {
-            return this.$$(By.linkText(text)).first().click();
+            return this.all(By.linkText(text)).first().click();
         },
 
         getReadyFirst() {
@@ -851,8 +937,16 @@ module.exports = new Base();
         },
 
         clickReadyFirst() {
+            this.getReadyFirst().click();
+        },
+
+        getReadyLast() {
             this.waitReady();
-            return this.first().click();
+            return this.last();
+        },
+
+        clickReadyLast() {
+            this.getReadyLast().click();
         },
 
         getReadyByIndex(index) {
@@ -907,7 +1001,6 @@ module.exports = new Base();
     By.addLocator('cssHasText', (cssEl, text, opt_parentElement) => {
         let using = opt_parentElement || document;
         let els = using.querySelectorAll(cssEl);
-        // Return an array of elements with the text.
         return Array.prototype.filter.call(els, (el) => {
             return el.textContent.trim() === text;
         });
@@ -916,7 +1009,6 @@ module.exports = new Base();
     By.addLocator('cssHasSubCss', (cssEl, subCss, opt_parentElement) => {
         let using = opt_parentElement || document;
         let els = using.querySelectorAll(cssEl);
-        // Return an array of elements with sub css.
         return Array.prototype.filter.call(els, (el) => {
             return el.querySelectorAll(subCss).length > 0
         });
@@ -925,7 +1017,6 @@ module.exports = new Base();
     By.addLocator('cssHasSubCssWithText', (cssEl, subCss, cssText, opt_parentElement) => {
         let using = opt_parentElement || document;
         let els = using.querySelectorAll(cssEl);
-        // Return an array of elements with sub css.
         return Array.prototype.filter.call(els, (el) => {
             return Array.prototype.filter.call(el.querySelectorAll(subCss), (el) => {
                 return el.textContent.trim() === cssText;
@@ -936,7 +1027,6 @@ module.exports = new Base();
     By.addLocator('cssSplitText', (cssEl, cssText, splitChar, opt_parentElement) => {
         let using = opt_parentElement || document;
         let els = using.querySelectorAll(cssEl);
-        // Return an array of elements with the text.
         return Array.prototype.filter.call(els, (el) => {
             return el.textContent.split(splitChar)[0].trim() === cssText;
         });
@@ -945,9 +1035,72 @@ module.exports = new Base();
     By.addLocator('cssHasTagText', (cssEl, text, opt_parentElement) => {
         let using = opt_parentElement || document;
         let els = using.querySelectorAll(cssEl);
-        // Return an array of elements with the text.
         return Array.prototype.filter.call(els, (el) => {
             return el.innerHTML.indexOf(`>${text}<`) >= 0;
         });
     });
+})();
+/**
+ * Utils.
+ */
+(function () {
+    Object.assign(Array.prototype, {
+
+        contains (it) {
+            return this.indexOf(it) > -1;
+        },
+
+        containsOneOf(arr) {
+            var found = false;
+            this.forEach(function (it) {
+                if (arr.indexOf(it) > -1) {
+                    found = true;
+                }
+            });
+            return found;
+        },
+
+        toLowerCase() {
+            return this.map(function (el) {
+                return el.toLowerCase();
+            });
+        },
+
+        removeEmpty() {
+            return this.filter(function (el) {
+                return !el.isEmpty();
+            });
+        }
+    },
+
+    Object.assign(String.prototype, {
+
+        contains(it) {
+            return this.indexOf(it) !== -1;
+        },
+
+        containsOneOf(arr) {
+            var found = false;
+            var text = this;
+            arr.forEach(function (it) {
+                if (text.contains(it)) {
+                    found = true;
+                }
+            });
+            return found;
+        },
+
+        format() {
+            var args = arguments;
+            var i = -1;
+            return this.replace(/\{(?:[^{}]|\{*\})*\}/g, function (val) {
+                i++;
+                return args[i] !== undefined ? args[i] : val;
+            });
+        },
+
+        getDigits() {
+            return this.match(/\d+/)[0]
+        }
+    }))
 })();

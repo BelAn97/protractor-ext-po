@@ -31,8 +31,7 @@
         }
     },
 
-    Object.assign(String.prototype = String.prototype.f, {
-
+    Object.assign(String.prototype, {
 
         contains(it) {
             return this.indexOf(it) !== -1;

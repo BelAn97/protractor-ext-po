@@ -30,19 +30,6 @@
             return this;
         },
 
-        waitReadyAngular() {
-            if (browser.ignoreSynchronization) {
-                base.setSynch();
-                browser.waitForAngular();
-                base.sleep(base.timeout.min);
-                this.waitReady();
-                base.setNoSynch();
-            } else {
-                this.waitReady();
-            }
-            return this;
-        },
-
         waitAllInvisible() {
             this.filter((el) => {
                 return el.isPresent()

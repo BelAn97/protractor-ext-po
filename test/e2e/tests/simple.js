@@ -11,5 +11,4 @@ describe('Simple Test Suit', function() {
         feature.featuresHeadlineList.checkTextListEqual(feature.CONST.HEADLINES)
     });
 
-
 });
