@@ -1,5 +1,5 @@
+require('protractor');
 const fs = require('fs');
-
 const chai = require('chai');
 const chaiThings = require('chai-things');
 const chaiAsPromised = require('chai-as-promised');
@@ -15,6 +15,7 @@ class Base {
          * wrap timeout. (ms) in t-shirt sizes
          */
         this.timeout = {
+            'zero': 50,
             'min': 200,
             'xs': 500,
             's': 1000,
@@ -65,16 +66,18 @@ class Base {
      * @requires page to include `angular` boolean variable
      */
     checkWaitForAngular() {
-        if (this.angular) {
-            this.setWaitForAngular();
-        } else {
-            this.setNoWaitForAngular();
+        if (this.angular !== undefined) {
+            if (this.angular) {
+                this.setWaitForAngular();
+            } else {
+                this.setNoWaitForAngular();
+            }
         }
     };
 
     sleep(ms) {
         flow.execute(() => {
-            // console.log(`*sleep: ${ms} ms`);
+            console.log(`*sleep: ${ms} ms`);
             browser.sleep(ms);
         });
     };
@@ -211,6 +214,13 @@ class Base {
         });
     };
 
+    goToPath(path) {
+        flow.execute(() => {
+            this.log('*goTo path: ' + base.domain + path);
+            browser.get(base.domain + path);
+        });
+    };
+
     saveCurrentUrl() {
         browser.getCurrentUrl().then((currentUrl) => {
             this.log(`*save url: ${currentUrl}`);
@@ -234,6 +244,14 @@ class Base {
     refresh() {
         this.log('*refresh');
         browser.refresh();
+    };
+
+    resetSession() {
+        this.log('*resetSession');
+        return browser.driver.manage().deleteAllCookies().then(() => {
+            browser.executeScript('window.localStorage.clear(); window.sessionStorage.clear();');
+            browser.refresh();
+        })
     };
 
     goBack() {
@@ -272,6 +290,26 @@ class Base {
         });
     };
 
+    switchToDefaultState() {
+        this.setNoWaitForAngular();
+        flow.execute(() =>  {
+            browser.switchTo().defaultContent().then(() => {
+                    browser.getAllWindowHandles().then((handles) => {
+                        for (let i=1; i<handles.length; i++) {
+                            browser.switchTo().window(handles[i]);
+                            browser.close();
+                        }
+                    });
+                },
+                (err) => {
+                    console.log(err);
+                    browser.restart();
+                    browser.switchTo().activeElement();
+                }
+            );
+        });
+    };
+
     switchToNew(currentWinHandle) {
         this.pause();
         this.setNoWaitForAngular();
@@ -296,14 +334,13 @@ class Base {
 
     switchToFrame(nameOrIndex) {
         browser.switchTo().defaultContent();
-        let frame = this;
         if (!nameOrIndex) {
-            frame.iframe.waitInDom();
-            nameOrIndex = frame.iframe.getWebElement();
+            this.iframe.waitInDom();
+            nameOrIndex = this.iframe.getWebElement();
         }
         this.setNoWaitForAngular();
         return browser.switchTo().frame(nameOrIndex).then(() => {
-            return frame.atFrame();
+            return this.atFrame();
         });
     };
 
@@ -329,15 +366,25 @@ class Base {
     /**
      * WebDriver alerts.
      */
+    isAlertPresent() {
+        return browser.getTitle().then(
+            () => {
+                return false;
+            }, () => {
+                return true;
+            }
+        );
+    };
+
     acceptAlert() {
-        browser.getTitle().then((title) => {}, (err) => {
+        if (base.isAlertPresent()) {
             browser.switchTo().alert().then((alert) => {
                     this.log("Accept alert");
                     alert.accept();
                 }, (err) => {
                 }
             );
-        });
+        }
     };
 
     checkAlert(message) {
@@ -350,12 +397,19 @@ class Base {
         );
     };
 
-    compareLowerCase(a, b) {
-        return a.toLowerCase().localeCompare(b.toLowerCase());
+    getSplitArray(arr, char){
+        return [].concat(arr).map((el) => {
+            return el.split(char)[0].trim();
+        });
     };
 
-    sortFloat(a, b) {
-        return a - b;
+    getSplitArrayMulti (arr, chars){
+        return [].concat(arr).map((el) => {
+            chars.forEach((char) => {
+                el = el.split(char)[0];
+            });
+            return el.trim();
+        });
     };
 
 }

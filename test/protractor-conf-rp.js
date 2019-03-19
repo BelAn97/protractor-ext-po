@@ -8,7 +8,7 @@ exports.config = {
     specs: [
         'e2e/tests/simple.js'
     ],
-
+    jvmArgs: ['-Xmx2g'],
     capabilities: {
         browserName: 'chrome',
         chromeOptions: {
@@ -56,9 +56,11 @@ exports.config = {
     },
 
     onPrepare: function () {
-        const dl = path.join(__dirname, '/downloads/');
-        fs.existsSync(dl) || fs.mkdirSync(dl);
-        browser.manage().window().setSize(1600, 1024);
+        const dl = path.join(__dirname,'/downloads/');
+        try {
+            fs.existsSync(dl) || fs.mkdirSync(dl);
+        } catch (ignored){}
+        browser.driver.manage().window().setSize(1600, 1024);
     }
 
 };

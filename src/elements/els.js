@@ -16,6 +16,14 @@
             });
         },
 
+        isPresentOneOf() {
+            return this.filter((el) => {
+                return el.isPresent();
+            }).count().then((count) => {
+                return count > 0;
+            });
+        },
+
         waitReady(timeout) {
             this.waitInDom();
             browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, `wait for visible one of: ${this.locator()}`);
@@ -47,6 +55,12 @@
             element(this.locator()).waitNotInDom();
         },
 
+        slice(begin, end) {
+            return this.then((elements) => {
+                return elements.slice(begin, end);
+            });
+        },
+
         getParents() {
             return this.all(By.xpath('./..'));
         },
@@ -66,25 +80,26 @@
         },
 
         clickAtFirstVisible() {
-            this.waitReady();
-            return this.filter((el) => {
-                return el.isDisplayed();
-            }).first().clickScript();
+            this.getFirstVisible().click();
         },
 
-        getTextList() {
+        clickAtLastVisible() {
+            this.getLastVisible().click();
+        },
+
+        getTextList(trim) {
             return this.map((elm) => {
                 return elm.getText().then((val) => {
-                    return val.trim();
+                    return trim ? val.trim() : val;
                 });
             });
         },
 
-        getTextListLimit(limit) {
-            return this.map(function (elm, i) {
+        getTextListLimit(limit, trim) {
+            return this.map((elm, i) => {
                 if (!limit || i<limit) {
-                    return elm.getText().then(function (val) {
-                        return val.trim();
+                    return elm.getText().then((val) => {
+                        return trim ? val.trim() : val;
                     });
                 }
             });
@@ -138,9 +153,8 @@
             return this.getAllByTextContains(text).clickAtFirstVisible();
         },
 
-
         clickAtLink(text) {
-            return this.$$(By.linkText(text)).first().click();
+            return this.all(By.linkText(text)).first().click();
         },
 
         getReadyFirst() {
@@ -149,8 +163,16 @@
         },
 
         clickReadyFirst() {
+            this.getReadyFirst().click();
+        },
+
+        getReadyLast() {
             this.waitReady();
-            return this.first().click();
+            return this.last();
+        },
+
+        clickReadyLast() {
+            this.getReadyLast().click();
         },
 
         getReadyByIndex(index) {

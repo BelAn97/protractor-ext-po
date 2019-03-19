@@ -1,6 +1,7 @@
 (function () {
     let ElementFinder = $('').constructor;
-    const buffer = require('buffer');
+    const buffer = require('copy-paste');
+    const _ = require('underscore');
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
 
@@ -11,19 +12,6 @@
 
         waitNotInDom(timeout) {
             browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, `wait not in dom: ${this.locator()}`);
-            return this;
-        },
-
-        waitReadyAngular() {
-            if (browser.ignoreSynchronization) {
-                base.setSynch();
-                browser.waitForAngular();
-                base.sleep(base.timeout.min);
-                this.waitReady();
-                base.setNoSynch();
-            } else {
-                this.waitReady();
-            }
             return this;
         },
 
@@ -103,11 +91,11 @@
             return this;
         },
 
-        sendKeysSlow(text) {
+        sendKeysSlow(text, interval) {
             let input = this.waitReady();
-            text.split('').forEach(function (char) {
+            text.split('').forEach((char) => {
                 input.sendKeys(char);
-                base.sleep(base.timeout.min);
+                base.sleep(interval || base.timeout.zero);
             });
             return this;
         },
@@ -116,13 +104,13 @@
             return this.waitClickable().click();
         },
 
-        clickScript() {
+        clickByScript() {
             this.waitInDom();
             browser.executeScript('arguments[0].click();', this);
             return this;
         },
 
-        clickCenter() {
+        clickByCenter() {
             this.waitReady();
             browser.actions().click(this).perform();
             return this;
@@ -135,12 +123,11 @@
         },
 
         clickIfExists() {
-            let self = this;
             this.isPresent().then((val) => {
                 if (val) {
-                    self.isDisplayed().then((val) => {
+                    this.isDisplayed().then((val) => {
                         if (val) {
-                            self.click();
+                            this.click();
                         }
                     });
                 }
@@ -148,14 +135,10 @@
         },
 
         pasteFromClipboard(value) {
-            var self = this;
-            flow.execute(function () {
-                buffer.copy(value, function() {
-                    self.clickReady();
-                    base.sleep(base.timeout.min);
-                    browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
-                });
-            });
+            buffer.copy(value);
+            this.clickReady();
+            base.sleep(base.timeout.min);
+            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
         },
 
         pressEnter() {
@@ -168,9 +151,42 @@
             return this;
         },
 
+        pressTab() {
+            browser.actions().sendKeys(protractor.Key.TAB).perform();
+            return this;
+        },
+
+        pressUp() {
+            browser.actions().sendKeys(protractor.Key.UP).perform();
+            return this;
+        },
+
+        pressDown() {
+            browser.actions().sendKeys(protractor.Key.DOWN).perform();
+            return this;
+        },
+        
         getTextReady() {
             return this.waitReady().getText();
         },
+
+        scrollAndGetTextList(list, scrolledElements, scrollCount) {
+            browser.executeScript('arguments[0].scrollIntoView(false);', scrolledPanel);
+            return this.getTextList().then((newList) => {
+                if (scrollCount > 0) {
+                    return this.scrollAndGetTextList(_.union(list, newList), scrolledElements, scrollCount - 1);
+                } else {
+                    return _.union(list, newList);
+                }
+            });
+        },
+
+        getTextListAtScrolled(scrolledElements, scrollCount) {
+            return scrolledElements.getTextList().then((list) => {
+                return this.scrollAndGetTextList(list, scrolledElements, scrollCount)
+            });
+
+        }
 
     });
 })();
