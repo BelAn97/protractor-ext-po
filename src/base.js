@@ -10,7 +10,7 @@ global.flow = protractor.promise.controlFlow();
 
 class Base {
 
-    constructor(){
+    constructor() {
         /**
          * wrap timeout. (ms) in t-shirt sizes
          */
@@ -23,8 +23,8 @@ class Base {
             'l': 5000,
             'xl': 10000,
             'xxl': 30000,
-            'xxxl': 60000,
-            'max': 900000
+            'xxxl': 90000,
+            'max': 1500000
         };
         this.EC = browser.ExpectedConditions;
         this.domain = '';
@@ -44,18 +44,19 @@ class Base {
 
     debug() {
         flow.execute(() => {
-            console.log('debug');
+            console.log(`debug`);
+            browser.debugger();
         });
     };
 
-    setWaitForAngular() {
-        flow.execute(() => {
+    async setWaitForAngularEnabled() {
+        await flow.execute(() => {
             browser.waitForAngularEnabled(true);
         });
     };
 
-    setNoWaitForAngular() {
-        flow.execute(() => {
+    async setWaitForAngularDisabled() {
+        await flow.execute(() => {
             browser.waitForAngularEnabled(false);
         });
     };
@@ -68,61 +69,66 @@ class Base {
     checkWaitForAngular() {
         if (this.angular !== undefined) {
             if (this.angular) {
-                this.setWaitForAngular();
+                this.setWaitForAngularEnabled();
             } else {
-                this.setNoWaitForAngular();
+                this.setWaitForAngularDisabled();
             }
         }
     };
 
-    sleep(ms) {
-        flow.execute(() => {
+    async sleep(ms) {
+        await flow.execute(() => {
             console.log(`*sleep: ${ms} ms`);
             browser.sleep(ms);
         });
     };
 
-    pause() {
-        this.sleep(this.timeout.xs);
+    async pause() {
+        await this.sleep(this.timeout.xs);
     };
 
-    log(value) {
+    async log(value) {
         if (!!value) {
-            flow.execute(() => {
+            await flow.execute(() => {
                 console.log(value);
             });
         }
     };
 
-    logTitle() {
+    async logTitle() {
         browser.getTitle().then((title) => {
             this.log(`Title: ${title}`);
         });
     };
 
-    waitForTitle(expected, timeout) {
-        return browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, `Waiting for title: ${expected}`);
-    };
-    waitForTitleContains(expected, timeout) {
-        return browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, `Wait for title contains: ${expected}`);
-    };
-    waitForUrl(expected, timeout) {
-        return browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, `Waiting for url: ${expected}`);
-    };
-    waitForUrlContains(expected, timeout) {
-        return browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, `Wait for url contains: ${expected}`);
-    };
-    waitForAlert(timeout) {
-        return browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, 'Waiting for alert');
+    async waitForTitle(expected, timeout) {
+        await browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, `Waiting for title: ${expected}`);
     };
 
-    waitFile(filePath, timeout) {
-        return browser.wait(() => {
+    async waitForTitleContains(expected, timeout) {
+        await browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, `Wait for title contains: ${expected}`);
+    };
+
+    async waitForUrl(expected, timeout) {
+        await browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, `Waiting for url: ${expected}`);
+    };
+
+    async waitForUrlContains(expected, timeout) {
+        await browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, `Wait for url contains: ${expected}`);
+    };
+
+    async waitForAlert(timeout) {
+        await browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, `Waiting for alert`);
+    };
+
+    async waitFile(filePath, timeout) {
+        await browser.wait(() => {
             return fs.existsSync(filePath)
         }, timeout || this.timeout.xxxl, `Wait File: ${filePath}`);
     };
-    waitFileGone (filePath, timeout) {
-        return browser.wait(() => {
+
+    async waitFileGone(filePath, timeout) {
+        await browser.wait(() => {
             return !fs.existsSync(filePath)
         }, timeout || this.timeout.xxl, `Wait File Gone: ${filePath}`);
     };
@@ -132,11 +138,11 @@ class Base {
      *
      * @requires page to include `loaded` webElement
      */
-    at(timeout) {
-        flow.execute(() => {
+    async at(timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.logTitle();
-            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Page: ' + (this.url || ''));
+            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Page: ` + (this.url || ``));
         });
     };
 
@@ -145,8 +151,8 @@ class Base {
      *
      * @requires page to include `loaded` webElement
      */
-    atFrame(timeout) {
-        flow.execute(() => {
+    async atFrame(timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Frame: ${this.iframe}`);
         });
@@ -157,15 +163,15 @@ class Base {
      *
      * @requires page to include `url` variable
      */
-    atUrl(url, timeout) {
-        flow.execute(() => {
+    async atUrl(url, timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForUrl(url || this.url, timeout);
         });
     };
 
-    atUrlContains(url, timeout) {
-        flow.execute(() => {
+    async atUrlContains(url, timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForUrlContains(url || this.url, timeout);
         });
@@ -176,28 +182,28 @@ class Base {
      *
      * @requires page to include `title` variable
      */
-    atTitle(title, timeout) {
-        flow.execute(() => {
+    async atTitle(title, timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForTitle(title || this.title, timeout);
         });
     };
 
-    atTitleContains(title, timeout) {
-        flow.execute(() => {
+    async atTitleContains(title, timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForTitleContains(title || this.title, timeout);
         });
     };
 
     /**
-     * navigate to a page via it's `url` var
+     * navigate to a page via it`s `url` var
      * and verify/wait via at()
      *
      * @requires page have both `url` and `loaded` properties
      */
-    goTo() {
-        flow.execute(() => {
+    async goTo() {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.log(`*goTo: ${base.domain + this.url}`);
             browser.navigate().to(base.domain + this.url);
@@ -205,8 +211,8 @@ class Base {
         });
     };
 
-    goToUrl(url) {
-        flow.execute(() => {
+    async goToUrl(url) {
+        await flow.execute(() => {
             url = url || base.domain + this.url;
             this.log(`*goTo url: ${url}`);
             browser.navigate().to(url);
@@ -214,88 +220,89 @@ class Base {
         });
     };
 
-    goToPath(path) {
-        flow.execute(() => {
-            this.log('*goTo path: ' + base.domain + path);
+    async goToPath(path) {
+        await flow.execute(() => {
+            this.log(`*goTo path: ` + base.domain + path);
             browser.get(base.domain + path);
         });
     };
 
-    saveCurrentUrl() {
-        browser.getCurrentUrl().then((currentUrl) => {
+    async saveCurrentUrl() {
+        await browser.getCurrentUrl().then((currentUrl) => {
             this.log(`*save url: ${currentUrl}`);
             this.savedUrl = currentUrl;
         });
     };
 
-    goToSavedUrl() {
-        flow.execute(() => {
+    async goToSavedUrl() {
+        await flow.execute(() => {
             this.log(`*goTo saved url: ${this.savedUrl}`);
             browser.navigate().to(this.savedUrl);
             this.pause();
         });
     };
 
-    restart() {
-        this.log('*restart');
-        browser.restartSync();
+    async restart() {
+        this.log(`*restart`);
+        await browser.restartSync();
     };
 
-    refresh() {
-        this.log('*refresh');
-        browser.refresh();
+    async refresh() {
+        this.log(`*refresh`);
+        await browser.refresh();
     };
 
-    resetSession() {
-        this.log('*resetSession');
-        return browser.driver.manage().deleteAllCookies().then(() => {
-            browser.executeScript('window.localStorage.clear(); window.sessionStorage.clear();');
+    async resetSession() {
+        this.log(`*resetSession`);
+        await browser.driver.manage().deleteAllCookies().then(() => {
+            browser.executeScript(`window.localStorage.clear(); window.sessionStorage.clear();`);
             browser.refresh();
         })
     };
 
-    goBack() {
-        this.log('*goBack');
-        flow.execute(() => {
+    async goBack() {
+        this.log(`*goBack`);
+        await flow.execute(() => {
             this.pause();
             browser.navigate().back();
             this.pause();
         });
     };
 
-    goForward() {
-        this.log('*goForward');
-        flow.execute(() => {
+    async goForward() {
+        this.log(`*goForward`);
+        await flow.execute(() => {
             this.pause();
             browser.navigate().forward();
             this.pause();
         });
     };
 
-    switchToWindow(windowHandleIndex) {
-        this.setNoWaitForAngular();
-        return browser.getAllWindowHandles().then((handles) => {
+    async switchToWindow(windowHandleIndex) {
+        this.setWaitForAngularDisabled();
+        await browser.getAllWindowHandles().then((handles) => {
             return browser.switchTo().window(handles[windowHandleIndex]);
         });
     };
 
-    switchToDefault() {
-        this.setNoWaitForAngular();
-        flow.execute(() => {
+    async switchToDefault() {
+        this.setWaitForAngularDisabled();
+        await flow.execute(() => {
             browser.switchTo().defaultContent().then(
-                () => {}, (err) => {
+                () => {
+                }, (err) => {
                     console.log(err);
                 }
             );
         });
     };
 
-    switchToDefaultState() {
-        this.setNoWaitForAngular();
-        flow.execute(() =>  {
+    async switchToDefaultState() {
+        this.setWaitForAngularDisabled();
+        await flow.execute(() => {
             browser.switchTo().defaultContent().then(() => {
                     browser.getAllWindowHandles().then((handles) => {
-                        for (let i=1; i<handles.length; i++) {
+                        for (let i = 1; i < handles.length; i++) {
                             browser.switchTo().window(handles[i]);
                             browser.close();
                         }
@@ -310,10 +317,10 @@ class Base {
         });
     };
 
-    switchToNew(currentWinHandle) {
+    async switchToNew(currentWinHandle) {
         this.pause();
-        this.setNoWaitForAngular();
-        return browser.getAllWindowHandles().then((handles) => {
+        this.setWaitForAngularDisabled();
+        await browser.getAllWindowHandles().then((handles) => {
             if (!!currentWinHandle) {
                 return browser.switchTo().window(handles.filter((handle) => {
                     return handle !== currentWinHandle
@@ -324,22 +331,26 @@ class Base {
         });
     };
 
-    switchCloseWindow() {
+    async switchCloseWindow() {
         browser.close();
-        this.setNoWaitForAngular();
-        return browser.getAllWindowHandles().then((handles) => {
-            return browser.switchTo().window(handles[0]);
+        this.setWaitForAngularDisabled();
+        await browser.getAllWindowHandles().then((handles) => {
+            if (handles.length > 1) {
+                browser.close();
+                return base.switchToWindow(0);
+            }
+            return handles[0];
         });
     };
 
-    switchToFrame(nameOrIndex) {
+    async switchToFrame(nameOrIndex) {
         browser.switchTo().defaultContent();
         if (!nameOrIndex) {
             this.iframe.waitInDom();
             nameOrIndex = this.iframe.getWebElement();
         }
-        this.setNoWaitForAngular();
-        return browser.switchTo().frame(nameOrIndex).then(() => {
+        this.setWaitForAngularDisabled();
+        await browser.switchTo().frame(nameOrIndex).then(() => {
             return this.atFrame();
         });
     };
@@ -347,26 +358,26 @@ class Base {
     /**
      * WebDriver actions.
      */
-    hitReturn() {
-        browser.actions().sendKeys(protractor.Key.ENTER).perform();
+    async hitReturn() {
+        await browser.actions().sendKeys(protractor.Key.RETURN).perform();
     };
 
-    hitSpace() {
-        browser.actions().sendKeys(protractor.Key.SPACE).perform();
+    async hitSpace() {
+        await browser.actions().sendKeys(protractor.Key.SPACE).perform();
     };
 
-    hitTab() {
-        browser.actions().sendKeys(protractor.Key.TAB).perform();
+    async hitTab() {
+        await browser.actions().sendKeys(protractor.Key.TAB).perform();
     };
 
-    hitEscape() {
-        browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+    async hitEscape() {
+        await browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
     };
 
     /**
      * WebDriver alerts.
      */
-    isAlertPresent() {
+    async isAlertPresent() {
         return browser.getTitle().then(
             () => {
                 return false;
@@ -376,9 +387,9 @@ class Base {
         );
     };
 
-    acceptAlert() {
+    async acceptAlert() {
         if (base.isAlertPresent()) {
-            browser.switchTo().alert().then((alert) => {
+            await browser.switchTo().alert().then((alert) => {
                     this.log("Accept alert");
                     alert.accept();
                 }, (err) => {
@@ -387,23 +398,24 @@ class Base {
         }
     };
 
-    checkAlert(message) {
+    async checkAlert(message) {
         this.waitForAlert();
-        browser.switchTo().alert().then((alert) => {
+        await browser.switchTo().alert().then((alert) => {
                 alert.getText().should.eventually.eq(message);
                 this.log("Accept alert");
                 alert.accept();
-            },(err) => {}
+            }, (err) => {
+            }
         );
     };
 
-    getSplitArray(arr, char){
+    async getSplitArray(arr, char) {
         return [].concat(arr).map((el) => {
             return el.split(char)[0].trim();
         });
     };
 
-    getSplitArrayMulti (arr, chars){
+    async getSplitArrayMulti(arr, chars) {
         return [].concat(arr).map((el) => {
             chars.forEach((char) => {
                 el = el.split(char)[0];
@@ -412,11 +424,34 @@ class Base {
         });
     };
 
+    static getYear() {
+        return new Date().getFullYear();
+    };
+
+    static splitByStep(arr, step) {
+        var steppedList = [];
+        var list = [];
+        for (var i = 0; i < arr.length; i += 1) {
+            list.push(arr[i]);
+            if (list.length === step) {
+                steppedList.push(list);
+                list = [];
+            }
+        }
+        return steppedList
+    };
+
     /**
      * comparators.
      */
     static compareLowerCase(a, b) {
-        return a.toLowerCase().localeCompare(b.toLowerCase());
+        if (a.toLowerCase() < b.toLowerCase()) {
+            return -1;
+        }
+        if (a.toLowerCase() > b.toLowerCase()) {
+            return 1;
+        }
+        return 0;
     };
 
     static compareFloat(a, b) {
@@ -424,7 +459,7 @@ class Base {
     };
 
     static comparePercentage(a, b) {
-        return parseFloat(a.replace('%', '')) - parseFloat(b.replace('%', ''));
+        return parseFloat(a.replace(`%`, ``)) - parseFloat(b.replace(`%`, ``));
     };
 
 }

@@ -41,7 +41,7 @@
         let using = opt_parentElement || document;
         let els = using.querySelectorAll(cssEl);
         return Array.prototype.filter.call(els, (el) => {
-            return el.innerHTML.indexOf(`>${text}<`) >= 0;
+            return el.innerHTML.indexOf('>' + text + '<') >= 0 || el.innerHTML.replace(/([\r\n\t])/g, '').search(new RegExp('>(\\s*)' + text.replace('(', '\\(').replace(')', '\\)') + '(\\s*)<', 'g')) >= 0;
         });
     });
 })();

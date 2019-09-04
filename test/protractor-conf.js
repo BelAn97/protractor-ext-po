@@ -1,5 +1,22 @@
 const fs = require('fs');
 const path = require('path');
+
+let chromeOptions = {
+    args: ['--no-sandbox', '--test-type=browser', 'disable-infobars=true'],
+    w3c: false,
+    prefs: {
+        'download': {
+            'prompt_for_download': false,
+            'directory_upgrade': true,
+            'default_directory': path.join(__dirname, '/downloads/')
+        },
+        'credentials_enable_service': false,
+        'profile': {
+            'password_manager_enabled': false
+        }
+    }
+};
+
 exports.config = {
 
     allScriptsTimeout: 300000,
@@ -11,20 +28,7 @@ exports.config = {
     jvmArgs: ['-Xmx2g'],
     capabilities: {
         browserName: 'chrome',
-        chromeOptions: {
-            args: ['--no-sandbox', '--test-type=browser', 'disable-infobars'],
-            prefs: {
-                'download': {
-                    'prompt_for_download': false,
-                    'directory_upgrade': true,
-                    'default_directory': path.join(__dirname,'/downloads/')
-                },
-                'credentials_enable_service': false,
-                'profile': {
-                    'password_manager_enabled': false
-                }
-            }
-        }
+        'goog:chromeOptions': chromeOptions,
         // shardTestFiles: true,
         // maxInstances: 2,
         // count: 1
@@ -46,10 +50,15 @@ exports.config = {
     },
 
     onPrepare() {
-        const dl = path.join(__dirname,'/downloads/');
+        const dl = path.join(__dirname, '/downloads/');
         try {
             fs.existsSync(dl) || fs.mkdirSync(dl);
-        } catch (ignored){}
+        } catch (ignored) {
+        }
+        browser.driver.sendChromiumCommand('Page.setDownloadBehavior', {
+            behavior: 'allow',
+            downloadPath: dl
+        });
         browser.driver.manage().window().setSize(1600, 1024);
     }
 

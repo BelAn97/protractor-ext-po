@@ -4,61 +4,67 @@
 (function () {
     Object.assign(Array.prototype, {
 
-        contains (it) {
-            return this.indexOf(it) > -1;
+            contains(it) {
+                return this.indexOf(it) > -1;
+            },
+
+            async containsOneOf(arr) {
+                var found = false;
+                await this.forEach((it) => {
+                    if (arr.indexOf(it) > -1) {
+                        found = true;
+                    }
+                });
+                return found;
+            },
+
+            async toLowerCase() {
+                return await this.map((el) => {
+                    return el.toLowerCase();
+                });
+            },
+
+            async toUpperCase() {
+                return await this.map((el) => {
+                    return el.toUpperCase();
+                });
+            },
+
+            async removeEmpty() {
+                return await this.filter((el) => {
+                    return !el.isEmpty();
+                });
+            }
         },
 
-        containsOneOf(arr) {
-            var found = false;
-            this.forEach(function (it) {
-                if (arr.indexOf(it) > -1) {
-                    found = true;
-                }
-            });
-            return found;
-        },
+        Object.assign(String.prototype, {
 
-        toLowerCase() {
-            return this.map(function (el) {
-                return el.toLowerCase();
-            });
-        },
+            contains(it) {
+                return this.indexOf(it) !== -1;
+            },
 
-        removeEmpty() {
-            return this.filter(function (el) {
-                return !el.isEmpty();
-            });
-        }
-    },
+            async containsOneOf(arr) {
+                var found = false;
+                var text = this;
+                await arr.forEach((it) => {
+                    if (text.contains(it)) {
+                        found = true;
+                    }
+                });
+                return found;
+            },
 
-    Object.assign(String.prototype, {
+            async format() {
+                var args = arguments;
+                var i = -1;
+                return await this.replace(/\{(?:[^{}]|\{*\})*\}/g, (val) => {
+                    i++;
+                    return args[i] !== undefined ? args[i] : val;
+                });
+            },
 
-        contains(it) {
-            return this.indexOf(it) !== -1;
-        },
-
-        containsOneOf(arr) {
-            var found = false;
-            var text = this;
-            arr.forEach(function (it) {
-                if (text.contains(it)) {
-                    found = true;
-                }
-            });
-            return found;
-        },
-
-        format() {
-            var args = arguments;
-            var i = -1;
-            return this.replace(/\{(?:[^{}]|\{*\})*\}/g, function (val) {
-                i++;
-                return args[i] !== undefined ? args[i] : val;
-            });
-        },
-
-        getDigits() {
-            return this.match(/\d+/)[0]
-        }
-    }))
+            getDigits() {
+                return this.match(/\d+/)[0]
+            }
+        }))
 })();
