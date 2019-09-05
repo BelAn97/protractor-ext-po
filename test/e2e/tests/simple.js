@@ -6,9 +6,15 @@ describe('Simple Test Suit', function() {
         feature.open();
     });
 
-    it('Negative test', () => {
+    it('Negative test', async () => {
         feature.open();
         feature.featuresHeadlineList.checkTextListEqual(feature.CONST.HEADLINES)
+    });
+
+    it('Negative async test', async () => {
+        feature.open();
+        let list = await feature.featuresHeadlineList.getTextList();
+        list.should.eql(feature.CONST.HEADLINES);
     });
 
 });

@@ -6,20 +6,20 @@
 
         asCheckBox() {
             return {
-                async get() {
+                get() {
                     return this;
                 },
-                async check() {
+                check() {
                     if (!this.isChecked()) {
                         this.clickScript();
                     }
                 },
-                async uncheck() {
+                uncheck() {
                     if (this.isChecked()) {
                         this.clickScript();
                     }
                 },
-                async isChecked() {
+                isChecked() {
                     return this.isSelected();
                 }
             };

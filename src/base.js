@@ -49,14 +49,14 @@ class Base {
         });
     };
 
-    async setWaitForAngularEnabled() {
-        await flow.execute(() => {
+    setWaitForAngularEnabled() {
+        flow.execute(() => {
             browser.waitForAngularEnabled(true);
         });
     };
 
-    async setWaitForAngularDisabled() {
-        await flow.execute(() => {
+    setWaitForAngularDisabled() {
+        flow.execute(() => {
             browser.waitForAngularEnabled(false);
         });
     };
@@ -76,59 +76,59 @@ class Base {
         }
     };
 
-    async sleep(ms) {
-        await flow.execute(() => {
+    sleep(ms) {
+        flow.execute(() => {
             console.log(`*sleep: ${ms} ms`);
             browser.sleep(ms);
         });
     };
 
-    async pause() {
-        await this.sleep(this.timeout.xs);
+    pause() {
+        this.sleep(this.timeout.xs);
     };
 
-    async log(value) {
+    log(value) {
         if (!!value) {
-            await flow.execute(() => {
+            flow.execute(() => {
                 console.log(value);
             });
         }
     };
 
-    async logTitle() {
+    logTitle() {
         browser.getTitle().then((title) => {
             this.log(`Title: ${title}`);
         });
     };
 
-    async waitForTitle(expected, timeout) {
-        await browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, `Waiting for title: ${expected}`);
+    waitForTitle(expected, timeout) {
+        browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, `Waiting for title: ${expected}`);
     };
 
-    async waitForTitleContains(expected, timeout) {
-        await browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, `Wait for title contains: ${expected}`);
+    waitForTitleContains(expected, timeout) {
+        browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, `Wait for title contains: ${expected}`);
     };
 
-    async waitForUrl(expected, timeout) {
-        await browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, `Waiting for url: ${expected}`);
+    waitForUrl(expected, timeout) {
+        browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, `Waiting for url: ${expected}`);
     };
 
-    async waitForUrlContains(expected, timeout) {
-        await browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, `Wait for url contains: ${expected}`);
+    waitForUrlContains(expected, timeout) {
+        browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, `Wait for url contains: ${expected}`);
     };
 
-    async waitForAlert(timeout) {
-        await browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, `Waiting for alert`);
+    waitForAlert(timeout) {
+        browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, `Waiting for alert`);
     };
 
-    async waitFile(filePath, timeout) {
-        await browser.wait(() => {
+    waitFile(filePath, timeout) {
+        browser.wait(() => {
             return fs.existsSync(filePath)
         }, timeout || this.timeout.xxxl, `Wait File: ${filePath}`);
     };
 
-    async waitFileGone(filePath, timeout) {
-        await browser.wait(() => {
+    waitFileGone(filePath, timeout) {
+        browser.wait(() => {
             return !fs.existsSync(filePath)
         }, timeout || this.timeout.xxl, `Wait File Gone: ${filePath}`);
     };
@@ -138,8 +138,8 @@ class Base {
      *
      * @requires page to include `loaded` webElement
      */
-    async at(timeout) {
-        await flow.execute(() => {
+    at(timeout) {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.logTitle();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Page: ` + (this.url || ``));
@@ -151,8 +151,8 @@ class Base {
      *
      * @requires page to include `loaded` webElement
      */
-    async atFrame(timeout) {
-        await flow.execute(() => {
+    atFrame(timeout) {
+        flow.execute(() => {
             this.checkWaitForAngular();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Frame: ${this.iframe}`);
         });
@@ -163,15 +163,15 @@ class Base {
      *
      * @requires page to include `url` variable
      */
-    async atUrl(url, timeout) {
-        await flow.execute(() => {
+    atUrl(url, timeout) {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForUrl(url || this.url, timeout);
         });
     };
 
-    async atUrlContains(url, timeout) {
-        await flow.execute(() => {
+    atUrlContains(url, timeout) {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForUrlContains(url || this.url, timeout);
         });
@@ -182,15 +182,15 @@ class Base {
      *
      * @requires page to include `title` variable
      */
-    async atTitle(title, timeout) {
-        await flow.execute(() => {
+    atTitle(title, timeout) {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForTitle(title || this.title, timeout);
         });
     };
 
-    async atTitleContains(title, timeout) {
-        await flow.execute(() => {
+    atTitleContains(title, timeout) {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForTitleContains(title || this.title, timeout);
         });
@@ -202,8 +202,8 @@ class Base {
      *
      * @requires page have both `url` and `loaded` properties
      */
-    async goTo() {
-        await flow.execute(() => {
+    goTo() {
+        flow.execute(() => {
             this.checkWaitForAngular();
             this.log(`*goTo: ${base.domain + this.url}`);
             browser.navigate().to(base.domain + this.url);
@@ -211,8 +211,8 @@ class Base {
         });
     };
 
-    async goToUrl(url) {
-        await flow.execute(() => {
+    goToUrl(url) {
+        flow.execute(() => {
             url = url || base.domain + this.url;
             this.log(`*goTo url: ${url}`);
             browser.navigate().to(url);
@@ -220,74 +220,74 @@ class Base {
         });
     };
 
-    async goToPath(path) {
-        await flow.execute(() => {
+    goToPath(path) {
+        flow.execute(() => {
             this.log(`*goTo path: ` + base.domain + path);
             browser.get(base.domain + path);
         });
     };
 
-    async saveCurrentUrl() {
-        await browser.getCurrentUrl().then((currentUrl) => {
+    saveCurrentUrl() {
+        browser.getCurrentUrl().then((currentUrl) => {
             this.log(`*save url: ${currentUrl}`);
             this.savedUrl = currentUrl;
         });
     };
 
-    async goToSavedUrl() {
-        await flow.execute(() => {
+    goToSavedUrl() {
+        flow.execute(() => {
             this.log(`*goTo saved url: ${this.savedUrl}`);
             browser.navigate().to(this.savedUrl);
             this.pause();
         });
     };
 
-    async restart() {
+    restart() {
         this.log(`*restart`);
-        await browser.restartSync();
+        browser.restartSync();
     };
 
-    async refresh() {
+    refresh() {
         this.log(`*refresh`);
-        await browser.refresh();
+        browser.refresh();
     };
 
-    async resetSession() {
+    resetSession() {
         this.log(`*resetSession`);
-        await browser.driver.manage().deleteAllCookies().then(() => {
+        browser.driver.manage().deleteAllCookies().then(() => {
             browser.executeScript(`window.localStorage.clear(); window.sessionStorage.clear();`);
             browser.refresh();
         })
     };
 
-    async goBack() {
+    goBack() {
         this.log(`*goBack`);
-        await flow.execute(() => {
+        flow.execute(() => {
             this.pause();
             browser.navigate().back();
             this.pause();
         });
     };
 
-    async goForward() {
+    goForward() {
         this.log(`*goForward`);
-        await flow.execute(() => {
+        flow.execute(() => {
             this.pause();
             browser.navigate().forward();
             this.pause();
         });
     };
 
-    async switchToWindow(windowHandleIndex) {
+    switchToWindow(windowHandleIndex) {
         this.setWaitForAngularDisabled();
-        await browser.getAllWindowHandles().then((handles) => {
+        browser.getAllWindowHandles().then((handles) => {
             return browser.switchTo().window(handles[windowHandleIndex]);
         });
     };
 
-    async switchToDefault() {
+    switchToDefault() {
         this.setWaitForAngularDisabled();
-        await flow.execute(() => {
+        flow.execute(() => {
             browser.switchTo().defaultContent().then(
                 () => {
                 }, (err) => {
@@ -297,9 +297,9 @@ class Base {
         });
     };
 
-    async switchToDefaultState() {
+    switchToDefaultState() {
         this.setWaitForAngularDisabled();
-        await flow.execute(() => {
+        flow.execute(() => {
             browser.switchTo().defaultContent().then(() => {
                     browser.getAllWindowHandles().then((handles) => {
                         for (let i = 1; i < handles.length; i++) {
@@ -317,10 +317,10 @@ class Base {
         });
     };
 
-    async switchToNew(currentWinHandle) {
+    switchToNew(currentWinHandle) {
         this.pause();
         this.setWaitForAngularDisabled();
-        await browser.getAllWindowHandles().then((handles) => {
+        browser.getAllWindowHandles().then((handles) => {
             if (!!currentWinHandle) {
                 return browser.switchTo().window(handles.filter((handle) => {
                     return handle !== currentWinHandle
@@ -331,10 +331,10 @@ class Base {
         });
     };
 
-    async switchCloseWindow() {
+    switchCloseWindow() {
         browser.close();
         this.setWaitForAngularDisabled();
-        await browser.getAllWindowHandles().then((handles) => {
+        browser.getAllWindowHandles().then((handles) => {
             if (handles.length > 1) {
                 browser.close();
                 return base.switchToWindow(0);
@@ -343,14 +343,14 @@ class Base {
         });
     };
 
-    async switchToFrame(nameOrIndex) {
+    switchToFrame(nameOrIndex) {
         browser.switchTo().defaultContent();
         if (!nameOrIndex) {
             this.iframe.waitInDom();
             nameOrIndex = this.iframe.getWebElement();
         }
         this.setWaitForAngularDisabled();
-        await browser.switchTo().frame(nameOrIndex).then(() => {
+        browser.switchTo().frame(nameOrIndex).then(() => {
             return this.atFrame();
         });
     };
@@ -358,26 +358,26 @@ class Base {
     /**
      * WebDriver actions.
      */
-    async hitReturn() {
-        await browser.actions().sendKeys(protractor.Key.RETURN).perform();
+    hitReturn() {
+        browser.actions().sendKeys(protractor.Key.RETURN).perform();
     };
 
-    async hitSpace() {
-        await browser.actions().sendKeys(protractor.Key.SPACE).perform();
+    hitSpace() {
+        browser.actions().sendKeys(protractor.Key.SPACE).perform();
     };
 
-    async hitTab() {
-        await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    hitTab() {
+        browser.actions().sendKeys(protractor.Key.TAB).perform();
     };
 
-    async hitEscape() {
-        await browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+    hitEscape() {
+        browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
     };
 
     /**
      * WebDriver alerts.
      */
-    async isAlertPresent() {
+    isAlertPresent() {
         return browser.getTitle().then(
             () => {
                 return false;
@@ -387,9 +387,9 @@ class Base {
         );
     };
 
-    async acceptAlert() {
+    acceptAlert() {
         if (base.isAlertPresent()) {
-            await browser.switchTo().alert().then((alert) => {
+            browser.switchTo().alert().then((alert) => {
                     this.log("Accept alert");
                     alert.accept();
                 }, (err) => {
@@ -398,9 +398,9 @@ class Base {
         }
     };
 
-    async checkAlert(message) {
+    checkAlert(message) {
         this.waitForAlert();
-        await browser.switchTo().alert().then((alert) => {
+        browser.switchTo().alert().then((alert) => {
                 alert.getText().should.eventually.eq(message);
                 this.log("Accept alert");
                 alert.accept();
@@ -409,13 +409,13 @@ class Base {
         );
     };
 
-    async getSplitArray(arr, char) {
+    getSplitArray(arr, char) {
         return [].concat(arr).map((el) => {
             return el.split(char)[0].trim();
         });
     };
 
-    async getSplitArrayMulti(arr, chars) {
+    getSplitArrayMulti(arr, chars) {
         return [].concat(arr).map((el) => {
             chars.forEach((char) => {
                 el = el.split(char)[0];

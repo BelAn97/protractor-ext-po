@@ -3,12 +3,12 @@
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
-        async waitInDom(timeout) {
+        waitInDom(timeout) {
             browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
             return this;
         },
 
-        async isDisplayedOneOf() {
+        isDisplayedOneOf() {
             return this.filter((el) => {
                 return el.isDisplayed();
             }).count().then((count) => {
@@ -16,7 +16,7 @@
             });
         },
 
-        async isPresentOneOf() {
+        isPresentOneOf() {
             return this.filter((el) => {
                 return el.isPresent();
             }).count().then((count) => {
@@ -24,13 +24,13 @@
             });
         },
 
-        async waitReady(timeout) {
+        waitReady(timeout) {
             this.waitInDom();
             browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, `wait for visible one of: ${this.locator()}`);
             return this;
         },
 
-        async waitAllInvisible() {
+        waitAllInvisible() {
             this.filter((el) => {
                 return el.isPresent()
             }).each((el) => {
@@ -38,43 +38,43 @@
             });
         },
 
-        async waitAllNotInDom() {
+        waitAllNotInDom() {
             element(this.locator()).waitNotInDom();
         },
 
-        async slice(begin, end) {
+        slice(begin, end) {
             return this.then((elements) => {
                 return elements.slice(begin, end);
             });
         },
 
-        async getParents() {
+        getParents() {
             return this.all(By.xpath('./..'));
         },
 
-        async getFirstVisible() {
+        getFirstVisible() {
             this.waitReady();
             return this.filter((el) => {
                 return el.isDisplayed();
             }).first();
         },
 
-        async getLastVisible() {
+        getLastVisible() {
             this.waitReady();
             return this.filter((el) => {
                 return el.isDisplayed();
             }).last();
         },
 
-        async clickAtFirstVisible() {
+        clickAtFirstVisible() {
             this.getFirstVisible().click();
         },
 
-        async clickAtLastVisible() {
+        clickAtLastVisible() {
             this.getLastVisible().click();
         },
 
-        async getTextList(trim) {
+        getTextList(trim) {
             return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return trim ? val.trim() : val;
@@ -82,7 +82,7 @@
             });
         },
 
-        async getTextListLimit(limit, trim) {
+        getTextListLimit(limit, trim) {
             return this.map((elm, i) => {
                 if (!limit || i < limit) {
                     return elm.getText().then((val) => {
@@ -92,7 +92,7 @@
             });
         },
 
-        async getTextListNorm() {
+        getTextListNorm() {
             return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return val.replace(/\n/g, ' ');
@@ -100,7 +100,7 @@
             });
         },
 
-        async getTextListLowerCase() {
+        getTextListLowerCase() {
             return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return val.trim().toLowerCase();
@@ -108,7 +108,7 @@
             });
         },
 
-        async getTextListSubstring(char) {
+        getTextListSubstring(char) {
             return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return val.split(char)[0].trim();
@@ -116,7 +116,7 @@
             });
         },
 
-        async getIntList() {
+        getIntList() {
             return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return parseInt(val.trim());
@@ -124,7 +124,7 @@
             });
         },
 
-        async getAttributeList(attribute) {
+        getAttributeList(attribute) {
             return this.map((elm) => {
                 return elm.getAttribute(attribute).then((val) => {
                     return val.trim();
@@ -132,53 +132,53 @@
             });
         },
 
-        async getAllByText(text) {
+        getAllByText(text) {
             return this.all(By.xpath(`./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]`));
         },
 
-        async getFirstByText(text) {
+        getFirstByText(text) {
             return this.getAllByText(text).getFirstVisible();
         },
 
-        async clickFirstByText(text) {
+        clickFirstByText(text) {
             return this.getAllByText(text).clickAtFirstVisible();
         },
 
-        async getAllByTextContains(text) {
+        getAllByTextContains(text) {
             return this.all(By.xpath(`./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]`));
         },
 
-        async getFirstByTextContains(text) {
+        getFirstByTextContains(text) {
             return this.getAllByTextContains(text).getFirstVisible();
         },
 
-        async clickFirstByTextContains(text) {
+        clickFirstByTextContains(text) {
             return this.getAllByTextContains(text).clickAtFirstVisible();
         },
 
-        async clickAtLink(text) {
+        clickAtLink(text) {
             return this.all(By.linkText(text)).first().click();
         },
 
-        async getReadyFirst() {
+        getReadyFirst() {
             this.waitReady();
             return this.first();
         },
 
-        async clickReadyFirst() {
+        clickReadyFirst() {
             this.getReadyFirst().click();
         },
 
-        async getReadyLast() {
+        getReadyLast() {
             this.waitReady();
             return this.last();
         },
 
-        async clickReadyLast() {
+        clickReadyLast() {
             this.getReadyLast().click();
         },
 
-        async getReadyByIndex(index) {
+        getReadyByIndex(index) {
             this.waitReady();
             return this.get(index).waitReady();
         }

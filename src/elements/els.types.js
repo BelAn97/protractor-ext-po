@@ -6,29 +6,29 @@
         asRadio() {
             let labels = this.getParents();
             return {
-                async get() {
+                get() {
                     return this;
                 },
-                async getNames() {
+                getNames() {
                     return labels.getTextList();
                 },
-                async isSelectedByName(name) {
+                isSelectedByName(name) {
                     return labels.getFirstByTextContains(name).$('input').isSelected();
                 },
-                async getByName(name) {
+                getByName(name) {
                     return labels.getFirstByText(name);
                 },
-                async getByNameContains(name) {
+                getByNameContains(name) {
                     return labels.getFirstByTextContains(name);
                 },
-                async selectByName(name) {
-                    await labels.clickFirstByText(name);
+                selectByName(name) {
+                    labels.clickFirstByText(name);
                 },
-                async selectByNameContains(name) {
-                    await labels.clickFirstByTextContains(name);
+                selectByNameContains(name) {
+                    labels.clickFirstByTextContains(name);
                 },
-                async selectByIndex(index) {
-                    await labels.get(index).click();
+                selectByIndex(index) {
+                    labels.get(index).click();
                 }
             }
         }

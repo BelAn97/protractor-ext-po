@@ -7,7 +7,7 @@ class HomePage{
         this.angular = true;
 
         this.logo = $('.hero-logo img');
-        this.getStartedButton = element(By.buttonText('Get Started'));
+        this.getStartedButton = $('.hero-cta');
         this.loaded = this.logo;
 
         this.CONST = {
