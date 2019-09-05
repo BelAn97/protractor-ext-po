@@ -65,12 +65,10 @@ exports.config = {
             fs.existsSync(dl) || fs.mkdirSync(dl);
         } catch (ignored) {
         }
-        if (driver === 'chrome') {
-            browser.driver.sendChromiumCommand('Page.setDownloadBehavior', {
-                behavior: 'allow',
-                downloadPath: dl
-            });
-        }
+        browser.driver.sendChromiumCommand('Page.setDownloadBehavior', {
+            behavior: 'allow',
+            downloadPath: dl
+        });
         browser.driver.manage().window().setSize(1600, 1024);
     }
 

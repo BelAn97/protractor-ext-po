@@ -1,4 +1,4 @@
-(function () {
+(() => {
     let ElementArrayFinder = $$('').constructor;
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
@@ -10,16 +10,16 @@
                     return this;
                 },
                 async getNames() {
-                    return await labels.getTextList();
+                    return labels.getTextList();
                 },
                 async isSelectedByName(name) {
-                    return await labels.getFirstByTextContains(name).$('input').isSelected();
+                    return labels.getFirstByTextContains(name).$('input').isSelected();
                 },
                 async getByName(name) {
-                    return await labels.getFirstByText(name);
+                    return labels.getFirstByText(name);
                 },
                 async getByNameContains(name) {
-                    return await labels.getFirstByTextContains(name);
+                    return labels.getFirstByTextContains(name);
                 },
                 async selectByName(name) {
                     await labels.clickFirstByText(name);

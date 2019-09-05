@@ -1,4 +1,4 @@
-(function () {
+(() => {
     let ElementFinder = $(``).constructor;
     const buffer = require(`copy-paste`);
     const _ = require(`underscore`);
@@ -41,40 +41,40 @@
         },
 
         async getParent() {
-            return await this.element(By.xpath(`./..`));
+            return this.element(By.xpath(`./..`));
         },
 
         async getValue() {
-            return await this.getAttribute(`value`);
+            return this.getAttribute(`value`);
         },
 
         async hasClass(klass) {
-            return await this.getAttribute(`class`).then((classes) => {
+            return this.getAttribute(`class`).then((classes) => {
                 base.log(`class attribute: ${classes}`);
                 return classes.split(` `).indexOf(klass) !== -1;
             });
         },
 
         async getInt() {
-            return await this.getTextReady().then((text) => {
+            return this.getTextReady().then((text) => {
                 return parseInt(text.match(/\d+/)[0]);
             });
         },
 
         async getWidth() {
-            return await this.getSize().then((size) => {
+            return this.getSize().then((size) => {
                 return size.width;
             });
         },
 
         async getNumber() {
-            return await this.getTextReady().then(function (text) {
+            return this.getTextReady().then((text) => {
                 return parseFloat(text);
             });
         },
 
         async findByText(searchText) {
-            return await this.element(By.xpath(`.//*[text()="${searchText}"]`));
+            return this.element(By.xpath(`.//*[text()="${searchText}"]`));
         },
 
         async focus() {
@@ -88,7 +88,7 @@
         },
 
         async focusClick() {
-            return await this.focus().clickReady();
+            return this.focus().clickReady();
         },
 
         async clearAndSetText(text) {
@@ -116,7 +116,7 @@
             return this;
         },
 
-        async clickAndWaitInvisible () {
+        async clickAndWaitInvisible() {
             await this.click();
             await this.waitInvisible();
         },
@@ -187,12 +187,12 @@
         },
 
         async getTextReady() {
-            return await this.waitReady().getText();
+            return this.waitReady().getText();
         },
 
         async scrollAndGetTextList(list, scrolledPanel, scrolledElements, scrollCount) {
             browser.executeScript(`arguments[0].scrollIntoView(false);`, scrolledPanel);
-            return await this.getTextList().then((newList) => {
+            return this.getTextList().then((newList) => {
                 if (scrollCount > 0) {
                     return this.scrollAndGetTextList(_.union(list, newList), scrolledPanel, scrolledElements, scrollCount - 1);
                 } else {
@@ -202,7 +202,7 @@
         },
 
         async getTextListAtScrolled(scrolledElements, scrollCount) {
-            return await scrolledElements.getTextList().then((list) => {
+            return scrolledElements.getTextList().then((list) => {
                 return this.scrollAndGetTextList(list, this, scrolledElements, scrollCount)
             });
         }

@@ -1,15 +1,15 @@
-(function () {
+(() => {
     let ElementArrayFinder = $$('').constructor;
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
         async waitInDom(timeout) {
-            await browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
+            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
             return this;
         },
 
         async isDisplayedOneOf() {
-            return await this.filter((el) => {
+            return this.filter((el) => {
                 return el.isDisplayed();
             }).count().then((count) => {
                 return count > 0;
@@ -17,7 +17,7 @@
         },
 
         async isPresentOneOf() {
-            return await this.filter((el) => {
+            return this.filter((el) => {
                 return el.isPresent();
             }).count().then((count) => {
                 return count > 0;
@@ -25,13 +25,13 @@
         },
 
         async waitReady(timeout) {
-            await this.waitInDom();
-            await browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, `wait for visible one of: ${this.locator()}`);
+            this.waitInDom();
+            browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, `wait for visible one of: ${this.locator()}`);
             return this;
         },
 
         async waitAllInvisible() {
-            await this.filter((el) => {
+            this.filter((el) => {
                 return el.isPresent()
             }).each((el) => {
                 el.waitInvisible();
@@ -39,43 +39,43 @@
         },
 
         async waitAllNotInDom() {
-            await element(this.locator()).waitNotInDom();
+            element(this.locator()).waitNotInDom();
         },
 
         async slice(begin, end) {
-            return await this.then((elements) => {
+            return this.then((elements) => {
                 return elements.slice(begin, end);
             });
         },
 
         async getParents() {
-            return await this.all(By.xpath('./..'));
+            return this.all(By.xpath('./..'));
         },
 
         async getFirstVisible() {
-            await this.waitReady();
-            return await this.filter((el) => {
+            this.waitReady();
+            return this.filter((el) => {
                 return el.isDisplayed();
             }).first();
         },
 
         async getLastVisible() {
-            await this.waitReady();
-            return await this.filter((el) => {
+            this.waitReady();
+            return this.filter((el) => {
                 return el.isDisplayed();
             }).last();
         },
 
         async clickAtFirstVisible() {
-            await this.getFirstVisible().click();
+            this.getFirstVisible().click();
         },
 
         async clickAtLastVisible() {
-            await this.getLastVisible().click();
+            this.getLastVisible().click();
         },
 
         async getTextList(trim) {
-            return await this.map((elm) => {
+            return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return trim ? val.trim() : val;
                 });
@@ -83,7 +83,7 @@
         },
 
         async getTextListLimit(limit, trim) {
-            return await this.map((elm, i) => {
+            return this.map((elm, i) => {
                 if (!limit || i < limit) {
                     return elm.getText().then((val) => {
                         return trim ? val.trim() : val;
@@ -93,15 +93,15 @@
         },
 
         async getTextListNorm() {
-            return await this.map(function (elm) {
-                return elm.getText().then(function (val) {
+            return this.map((elm) => {
+                return elm.getText().then((val) => {
                     return val.replace(/\n/g, ' ');
                 });
             });
         },
 
         async getTextListLowerCase() {
-            return await this.map((elm) => {
+            return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return val.trim().toLowerCase();
                 });
@@ -109,7 +109,7 @@
         },
 
         async getTextListSubstring(char) {
-            return await this.map((elm) => {
+            return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return val.split(char)[0].trim();
                 });
@@ -117,15 +117,15 @@
         },
 
         async getIntList() {
-            return await this.map(function (elm) {
-                return elm.getText().then(function (val) {
+            return this.map((elm) => {
+                return elm.getText().then((val) => {
                     return parseInt(val.trim());
                 });
             });
         },
 
         async getAttributeList(attribute) {
-            return await this.map((elm) => {
+            return this.map((elm) => {
                 return elm.getAttribute(attribute).then((val) => {
                     return val.trim();
                 });
@@ -133,54 +133,54 @@
         },
 
         async getAllByText(text) {
-            return await this.all(By.xpath(`./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]`));
+            return this.all(By.xpath(`./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]`));
         },
 
         async getFirstByText(text) {
-            return await this.getAllByText(text).getFirstVisible();
+            return this.getAllByText(text).getFirstVisible();
         },
 
         async clickFirstByText(text) {
-            return await this.getAllByText(text).clickAtFirstVisible();
+            return this.getAllByText(text).clickAtFirstVisible();
         },
 
         async getAllByTextContains(text) {
-            return await this.all(By.xpath(`./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]`));
+            return this.all(By.xpath(`./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]`));
         },
 
         async getFirstByTextContains(text) {
-            return await this.getAllByTextContains(text).getFirstVisible();
+            return this.getAllByTextContains(text).getFirstVisible();
         },
 
         async clickFirstByTextContains(text) {
-            return await this.getAllByTextContains(text).clickAtFirstVisible();
+            return this.getAllByTextContains(text).clickAtFirstVisible();
         },
 
         async clickAtLink(text) {
-            return await this.all(By.linkText(text)).first().click();
+            return this.all(By.linkText(text)).first().click();
         },
 
         async getReadyFirst() {
             this.waitReady();
-            return await this.first();
+            return this.first();
         },
 
         async clickReadyFirst() {
-            await this.getReadyFirst().click();
+            this.getReadyFirst().click();
         },
 
         async getReadyLast() {
-            await this.waitReady();
-            return await this.last();
+            this.waitReady();
+            return this.last();
         },
 
         async clickReadyLast() {
-            await this.getReadyLast().click();
+            this.getReadyLast().click();
         },
 
         async getReadyByIndex(index) {
-            await this.waitReady();
-            return await this.get(index).waitReady();
+            this.waitReady();
+            return this.get(index).waitReady();
         }
 
     });

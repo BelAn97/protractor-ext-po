@@ -10,7 +10,7 @@ global.flow = protractor.promise.controlFlow();
 
 class Base {
 
-    constructor(){
+    constructor() {
         /**
          * wrap timeout. (ms) in t-shirt sizes
          */
@@ -23,8 +23,8 @@ class Base {
             'l': 5000,
             'xl': 10000,
             'xxl': 30000,
-            'xxxl': 60000,
-            'max': 900000
+            'xxxl': 90000,
+            'max': 1500000
         };
         this.EC = browser.ExpectedConditions;
         this.domain = '';
@@ -44,18 +44,19 @@ class Base {
 
     debug() {
         flow.execute(() => {
-            console.log('debug');
+            console.log(`debug`);
+            browser.debugger();
         });
     };
 
-    setWaitForAngular() {
-        flow.execute(() => {
+    async setWaitForAngularEnabled() {
+        await flow.execute(() => {
             browser.waitForAngularEnabled(true);
         });
     };
 
-    setNoWaitForAngular() {
-        flow.execute(() => {
+    async setWaitForAngularDisabled() {
+        await flow.execute(() => {
             browser.waitForAngularEnabled(false);
         });
     };
@@ -68,61 +69,66 @@ class Base {
     checkWaitForAngular() {
         if (this.angular !== undefined) {
             if (this.angular) {
-                this.setWaitForAngular();
+                this.setWaitForAngularEnabled();
             } else {
-                this.setNoWaitForAngular();
+                this.setWaitForAngularDisabled();
             }
         }
     };
 
-    sleep(ms) {
-        flow.execute(() => {
+    async sleep(ms) {
+        await flow.execute(() => {
             console.log(`*sleep: ${ms} ms`);
             browser.sleep(ms);
         });
     };
 
-    pause() {
-        this.sleep(this.timeout.xs);
+    async pause() {
+        await this.sleep(this.timeout.xs);
     };
 
-    log(value) {
+    async log(value) {
         if (!!value) {
-            flow.execute(() => {
+            await flow.execute(() => {
                 console.log(value);
             });
         }
     };
 
-    logTitle() {
+    async logTitle() {
         browser.getTitle().then((title) => {
             this.log(`Title: ${title}`);
         });
     };
 
-    waitForTitle(expected, timeout) {
-        return browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, `Waiting for title: ${expected}`);
-    };
-    waitForTitleContains(expected, timeout) {
-        return browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, `Wait for title contains: ${expected}`);
-    };
-    waitForUrl(expected, timeout) {
-        return browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, `Waiting for url: ${expected}`);
-    };
-    waitForUrlContains(expected, timeout) {
-        return browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, `Wait for url contains: ${expected}`);
-    };
-    waitForAlert(timeout) {
-        return browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, 'Waiting for alert');
+    async waitForTitle(expected, timeout) {
+        await browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, `Waiting for title: ${expected}`);
     };
 
-    waitFile(filePath, timeout) {
-        return browser.wait(() => {
+    async waitForTitleContains(expected, timeout) {
+        await browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, `Wait for title contains: ${expected}`);
+    };
+
+    async waitForUrl(expected, timeout) {
+        await browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, `Waiting for url: ${expected}`);
+    };
+
+    async waitForUrlContains(expected, timeout) {
+        await browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, `Wait for url contains: ${expected}`);
+    };
+
+    async waitForAlert(timeout) {
+        await browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, `Waiting for alert`);
+    };
+
+    async waitFile(filePath, timeout) {
+        await browser.wait(() => {
             return fs.existsSync(filePath)
         }, timeout || this.timeout.xxxl, `Wait File: ${filePath}`);
     };
-    waitFileGone (filePath, timeout) {
-        return browser.wait(() => {
+
+    async waitFileGone(filePath, timeout) {
+        await browser.wait(() => {
             return !fs.existsSync(filePath)
         }, timeout || this.timeout.xxl, `Wait File Gone: ${filePath}`);
     };
@@ -132,11 +138,11 @@ class Base {
      *
      * @requires page to include `loaded` webElement
      */
-    at(timeout) {
-        flow.execute(() => {
+    async at(timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.logTitle();
-            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, 'Wait Loaded Element For Page: ' + (this.url || ''));
+            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Page: ` + (this.url || ``));
         });
     };
 
@@ -145,8 +151,8 @@ class Base {
      *
      * @requires page to include `loaded` webElement
      */
-    atFrame(timeout) {
-        flow.execute(() => {
+    async atFrame(timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Frame: ${this.iframe}`);
         });
@@ -157,15 +163,15 @@ class Base {
      *
      * @requires page to include `url` variable
      */
-    atUrl(url, timeout) {
-        flow.execute(() => {
+    async atUrl(url, timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForUrl(url || this.url, timeout);
         });
     };
 
-    atUrlContains(url, timeout) {
-        flow.execute(() => {
+    async atUrlContains(url, timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForUrlContains(url || this.url, timeout);
         });
@@ -176,28 +182,28 @@ class Base {
      *
      * @requires page to include `title` variable
      */
-    atTitle(title, timeout) {
-        flow.execute(() => {
+    async atTitle(title, timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForTitle(title || this.title, timeout);
         });
     };
 
-    atTitleContains(title, timeout) {
-        flow.execute(() => {
+    async atTitleContains(title, timeout) {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.waitForTitleContains(title || this.title, timeout);
         });
     };
 
     /**
-     * navigate to a page via it's `url` var
+     * navigate to a page via it`s `url` var
      * and verify/wait via at()
      *
      * @requires page have both `url` and `loaded` properties
      */
-    goTo() {
-        flow.execute(() => {
+    async goTo() {
+        await flow.execute(() => {
             this.checkWaitForAngular();
             this.log(`*goTo: ${base.domain + this.url}`);
             browser.navigate().to(base.domain + this.url);
@@ -205,8 +211,8 @@ class Base {
         });
     };
 
-    goToUrl(url) {
-        flow.execute(() => {
+    async goToUrl(url) {
+        await flow.execute(() => {
             url = url || base.domain + this.url;
             this.log(`*goTo url: ${url}`);
             browser.navigate().to(url);
@@ -214,88 +220,89 @@ class Base {
         });
     };
 
-    goToPath(path) {
-        flow.execute(() => {
-            this.log('*goTo path: ' + base.domain + path);
+    async goToPath(path) {
+        await flow.execute(() => {
+            this.log(`*goTo path: ` + base.domain + path);
             browser.get(base.domain + path);
         });
     };
 
-    saveCurrentUrl() {
-        browser.getCurrentUrl().then((currentUrl) => {
+    async saveCurrentUrl() {
+        await browser.getCurrentUrl().then((currentUrl) => {
             this.log(`*save url: ${currentUrl}`);
             this.savedUrl = currentUrl;
         });
     };
 
-    goToSavedUrl() {
-        flow.execute(() => {
+    async goToSavedUrl() {
+        await flow.execute(() => {
             this.log(`*goTo saved url: ${this.savedUrl}`);
             browser.navigate().to(this.savedUrl);
             this.pause();
         });
     };
 
-    restart() {
-        this.log('*restart');
-        browser.restartSync();
+    async restart() {
+        this.log(`*restart`);
+        await browser.restartSync();
     };
 
-    refresh() {
-        this.log('*refresh');
-        browser.refresh();
+    async refresh() {
+        this.log(`*refresh`);
+        await browser.refresh();
     };
 
-    resetSession() {
-        this.log('*resetSession');
-        return browser.driver.manage().deleteAllCookies().then(() => {
-            browser.executeScript('window.localStorage.clear(); window.sessionStorage.clear();');
+    async resetSession() {
+        this.log(`*resetSession`);
+        await browser.driver.manage().deleteAllCookies().then(() => {
+            browser.executeScript(`window.localStorage.clear(); window.sessionStorage.clear();`);
             browser.refresh();
         })
     };
 
-    goBack() {
-        this.log('*goBack');
-        flow.execute(() => {
+    async goBack() {
+        this.log(`*goBack`);
+        await flow.execute(() => {
             this.pause();
             browser.navigate().back();
             this.pause();
         });
     };
 
-    goForward() {
-        this.log('*goForward');
-        flow.execute(() => {
+    async goForward() {
+        this.log(`*goForward`);
+        await flow.execute(() => {
             this.pause();
             browser.navigate().forward();
             this.pause();
         });
     };
 
-    switchToWindow(windowHandleIndex) {
-        this.setNoWaitForAngular();
-        return browser.getAllWindowHandles().then((handles) => {
+    async switchToWindow(windowHandleIndex) {
+        this.setWaitForAngularDisabled();
+        await browser.getAllWindowHandles().then((handles) => {
             return browser.switchTo().window(handles[windowHandleIndex]);
         });
     };
 
-    switchToDefault() {
-        this.setNoWaitForAngular();
-        flow.execute(() => {
+    async switchToDefault() {
+        this.setWaitForAngularDisabled();
+        await flow.execute(() => {
             browser.switchTo().defaultContent().then(
-                () => {}, (err) => {
+                () => {
+                }, (err) => {
                     console.log(err);
                 }
             );
         });
     };
 
-    switchToDefaultState() {
-        this.setNoWaitForAngular();
-        flow.execute(() =>  {
+    async switchToDefaultState() {
+        this.setWaitForAngularDisabled();
+        await flow.execute(() => {
             browser.switchTo().defaultContent().then(() => {
                     browser.getAllWindowHandles().then((handles) => {
-                        for (let i=1; i<handles.length; i++) {
+                        for (let i = 1; i < handles.length; i++) {
                             browser.switchTo().window(handles[i]);
                             browser.close();
                         }
@@ -310,10 +317,10 @@ class Base {
         });
     };
 
-    switchToNew(currentWinHandle) {
+    async switchToNew(currentWinHandle) {
         this.pause();
-        this.setNoWaitForAngular();
-        return browser.getAllWindowHandles().then((handles) => {
+        this.setWaitForAngularDisabled();
+        await browser.getAllWindowHandles().then((handles) => {
             if (!!currentWinHandle) {
                 return browser.switchTo().window(handles.filter((handle) => {
                     return handle !== currentWinHandle
@@ -324,22 +331,26 @@ class Base {
         });
     };
 
-    switchCloseWindow() {
+    async switchCloseWindow() {
         browser.close();
-        this.setNoWaitForAngular();
-        return browser.getAllWindowHandles().then((handles) => {
-            return browser.switchTo().window(handles[0]);
+        this.setWaitForAngularDisabled();
+        await browser.getAllWindowHandles().then((handles) => {
+            if (handles.length > 1) {
+                browser.close();
+                return base.switchToWindow(0);
+            }
+            return handles[0];
         });
     };
 
-    switchToFrame(nameOrIndex) {
+    async switchToFrame(nameOrIndex) {
         browser.switchTo().defaultContent();
         if (!nameOrIndex) {
             this.iframe.waitInDom();
             nameOrIndex = this.iframe.getWebElement();
         }
-        this.setNoWaitForAngular();
-        return browser.switchTo().frame(nameOrIndex).then(() => {
+        this.setWaitForAngularDisabled();
+        await browser.switchTo().frame(nameOrIndex).then(() => {
             return this.atFrame();
         });
     };
@@ -347,26 +358,26 @@ class Base {
     /**
      * WebDriver actions.
      */
-    hitReturn() {
-        browser.actions().sendKeys(protractor.Key.ENTER).perform();
+    async hitReturn() {
+        await browser.actions().sendKeys(protractor.Key.RETURN).perform();
     };
 
-    hitSpace() {
-        browser.actions().sendKeys(protractor.Key.SPACE).perform();
+    async hitSpace() {
+        await browser.actions().sendKeys(protractor.Key.SPACE).perform();
     };
 
-    hitTab() {
-        browser.actions().sendKeys(protractor.Key.TAB).perform();
+    async hitTab() {
+        await browser.actions().sendKeys(protractor.Key.TAB).perform();
     };
 
-    hitEscape() {
-        browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+    async hitEscape() {
+        await browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
     };
 
     /**
      * WebDriver alerts.
      */
-    isAlertPresent() {
+    async isAlertPresent() {
         return browser.getTitle().then(
             () => {
                 return false;
@@ -376,9 +387,9 @@ class Base {
         );
     };
 
-    acceptAlert() {
+    async acceptAlert() {
         if (base.isAlertPresent()) {
-            browser.switchTo().alert().then((alert) => {
+            await browser.switchTo().alert().then((alert) => {
                     this.log("Accept alert");
                     alert.accept();
                 }, (err) => {
@@ -387,23 +398,24 @@ class Base {
         }
     };
 
-    checkAlert(message) {
+    async checkAlert(message) {
         this.waitForAlert();
-        browser.switchTo().alert().then((alert) => {
+        await browser.switchTo().alert().then((alert) => {
                 alert.getText().should.eventually.eq(message);
                 this.log("Accept alert");
                 alert.accept();
-            },(err) => {}
+            }, (err) => {
+            }
         );
     };
 
-    getSplitArray(arr, char){
+    async getSplitArray(arr, char) {
         return [].concat(arr).map((el) => {
             return el.split(char)[0].trim();
         });
     };
 
-    getSplitArrayMulti (arr, chars){
+    async getSplitArrayMulti(arr, chars) {
         return [].concat(arr).map((el) => {
             chars.forEach((char) => {
                 el = el.split(char)[0];
@@ -412,11 +424,34 @@ class Base {
         });
     };
 
+    static getYear() {
+        return new Date().getFullYear();
+    };
+
+    static splitByStep(arr, step) {
+        var steppedList = [];
+        var list = [];
+        for (var i = 0; i < arr.length; i += 1) {
+            list.push(arr[i]);
+            if (list.length === step) {
+                steppedList.push(list);
+                list = [];
+            }
+        }
+        return steppedList
+    };
+
     /**
      * comparators.
      */
     static compareLowerCase(a, b) {
-        return a.toLowerCase().localeCompare(b.toLowerCase());
+        if (a.toLowerCase() < b.toLowerCase()) {
+            return -1;
+        }
+        if (a.toLowerCase() > b.toLowerCase()) {
+            return 1;
+        }
+        return 0;
     };
 
     static compareFloat(a, b) {
@@ -424,14 +459,14 @@ class Base {
     };
 
     static comparePercentage(a, b) {
-        return parseFloat(a.replace('%', '')) - parseFloat(b.replace('%', ''));
+        return parseFloat(a.replace(`%`, ``)) - parseFloat(b.replace(`%`, ``));
     };
 
 }
 
 module.exports = new Base();
-(function () {
-    let ElementFinder = $('').constructor;
+(() => {
+    let ElementFinder = $(``).constructor;
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
 
@@ -467,12 +502,20 @@ module.exports = new Base();
             this.getText().should.eventually.contains(text, msg || `check that text contains: ${this.locator()}`);
         },
 
+        checkTextContainsOneOf(list, msg) {
+            this.getText().should.eventually.contains.oneOf(list, msg || `check that text contains one of: ${this.locator()}`);
+        },
+
         checkTextNotContains(text, msg) {
             this.getText().should.eventually.not.contains(text, msg || `check that text not contains: ${this.locator()}`);
         },
 
         checkValue(value, msg) {
             this.getValue().should.eventually.eq(value, msg || `check that value: ${this.locator()}`);
+        },
+
+        checkValueContains(value, msg) {
+            this.getValue().should.eventually.contains(value, msg || `check that value contains: ${this.locator()}`);
         },
 
         checkHasClass(klass, msg) {
@@ -483,237 +526,265 @@ module.exports = new Base();
             this.hasClass(klass).should.eventually.eq(false, msg || `check that element does not have the class: ${this.locator()}`);
         },
 
+        checkAttribute(attribute, text, msg) {
+            this.getAttribute(attribute).should.eventually.eq(text, msg || `check attribute: ` + this.locator());
+        },
+
+        checkAttributeNotEqual(attribute, text, msg) {
+            this.getAttribute(attribute).should.eventually.not.eq(text, msg || `check attribute not equal: ` + this.locator());
+        },
+
+        checkAttributeContains(attribute, text, msg) {
+            this.getAttribute(attribute).should.eventually.contains(text, msg || `check attribute contains: ` + this.locator());
+        },
+
+        checkAttributeNotContains(attribute, text, msg) {
+            this.getAttribute(attribute).should.eventually.not.contains(text, msg || `check attribute not contains: ` + this.locator());
+        }
     });
 })();
-(function () {
-    let ElementFinder = $('').constructor;
-    const buffer = require('copy-paste');
-    const _ = require('underscore');
+(() => {
+    let ElementFinder = $(``).constructor;
+    const buffer = require(`copy-paste`);
+    const _ = require(`underscore`);
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
 
-        waitInDom(timeout) {
-            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
+        async waitInDom(timeout) {
+            await await browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
             return this;
         },
 
-        waitNotInDom(timeout) {
-            browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, `wait not in dom: ${this.locator()}`);
+        async waitNotInDom(timeout) {
+            await browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, `wait not in dom: ${this.locator()}`);
             return this;
         },
 
-        waitReady(timeout) {
-            browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, `wait for visible: ${this.locator()}`);
+        async waitReady(timeout) {
+            await browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, `wait for visible: ${this.locator()}`);
             return this;
         },
 
-        waitInvisible(timeout) {
-            browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, `wait for invisible: ${this.locator()}`);
+        async waitInvisible(timeout) {
+            await browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, `wait for invisible: ${this.locator()}`);
             return this;
         },
 
-        waitClickable(timeout) {
-            browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, `wait clickable: ${this.locator()}`);
+        async waitClickable(timeout) {
+            await browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, `wait clickable: ${this.locator()}`);
             return this;
         },
 
-        waitForText(text, timeout) {
-            browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, `wait for text: ${this.locator()}`);
+        async waitForText(text, timeout) {
+            await browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, `wait for text: ${this.locator()}`);
             return this;
         },
 
-        waitForValue(value, timeout) {
-            browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, `wait for value: ${this.locator()}`);
+        async waitForValue(value, timeout) {
+            await browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, `wait for value: ${this.locator()}`);
             return this;
         },
 
-        getParent() {
-            return this.element(By.xpath('./..'));
+        async getParent() {
+            return this.element(By.xpath(`./..`));
         },
 
-        getValue() {
-            return this.getAttribute('value');
+        async getValue() {
+            return this.getAttribute(`value`);
         },
 
-        hasClass(klass) {
-            return this.getAttribute('class').then((classes) => {
+        async hasClass(klass) {
+            return this.getAttribute(`class`).then((classes) => {
                 base.log(`class attribute: ${classes}`);
-                return classes.split(' ').indexOf(klass) !== -1;
+                return classes.split(` `).indexOf(klass) !== -1;
             });
         },
 
-        getInt() {
+        async getInt() {
             return this.getTextReady().then((text) => {
                 return parseInt(text.match(/\d+/)[0]);
             });
         },
 
-        getWidth() {
+        async getWidth() {
             return this.getSize().then((size) => {
                 return size.width;
             });
         },
 
-        findByText(searchText) {
+        async getNumber() {
+            return this.getTextReady().then((text) => {
+                return parseFloat(text);
+            });
+        },
+
+        async findByText(searchText) {
             return this.element(By.xpath(`.//*[text()="${searchText}"]`));
         },
 
-        focus() {
-            browser.actions().mouseMove(this.waitReady()).perform();
+        async focus() {
+            await browser.actions().mouseMove(this.waitReady()).perform();
             return this;
         },
 
-        focusBy(xCoordinate, yCoordinate) {
-            browser.actions().mouseMove(this.waitReady(), {x: xCoordinate, y: yCoordinate}).perform();
+        async focusBy(xCoordinate, yCoordinate) {
+            await browser.actions().mouseMove(this.waitReady(), {x: xCoordinate, y: yCoordinate}).perform();
             return this;
         },
 
-        focusClick() {
+        async focusClick() {
             return this.focus().clickReady();
         },
 
-        clearAndSetText(text) {
-            let input = this.waitReady();
-            input.clear().sendKeys(text);
+        async clearAndSetText(text) {
+            let input = await this.waitReady();
+            await input.clear().sendKeys(text);
             return this;
         },
 
-        sendKeysSlow(text, interval) {
-            let input = this.waitReady();
-            text.split('').forEach((char) => {
-                input.sendKeys(char);
-                base.sleep(interval || base.timeout.zero);
+        async sendKeysSlow(text, interval) {
+            let input = await this.waitReady();
+            text.split(``).forEach(async (char) => {
+                await input.sendKeys(char);
+                await base.sleep(interval || base.timeout.zero);
             });
             return this;
         },
 
-        clickReady() {
-            return this.waitClickable().click();
+        async clickReady() {
+            await this.waitClickable().click();
         },
 
-        clickByScript() {
-            this.waitInDom();
-            browser.executeScript('arguments[0].click();', this);
+        async clickByScript() {
+            await this.waitInDom();
+            await browser.executeScript(`arguments[0].click();`, this);
             return this;
         },
 
-        clickByCenter() {
-            this.waitReady();
-            browser.actions().click(this).perform();
+        async clickAndWaitInvisible() {
+            await this.click();
+            await this.waitInvisible();
+        },
+
+        async clickAtCenter() {
+            await browser.actions().click(await this.waitClickable()).perform();
             return this;
         },
 
-        clickAtCorner() {
-            this.waitReady();
-            browser.actions().mouseMove(this, {x: 1, y: 1}).click().perform();
+        async clickAtCorner() {
+            await browser.actions().mouseMove(await this.waitClickable(), {x: 1, y: 1}).click().perform();
             return this;
         },
 
-        clickIfExists() {
-            this.isPresent().then((val) => {
-                if (val) {
-                    this.isDisplayed().then((val) => {
-                        if (val) {
-                            this.click();
-                        }
-                    });
-                }
-            });
+        async clickIfExists() {
+            if (await this.isPresent() && await this.isDisplayed()) {
+                this.click();
+            }
         },
 
-        pasteFromClipboard(value) {
-            buffer.copy(value);
-            this.clickReady();
-            base.sleep(base.timeout.min);
-            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
-        },
-
-        pressEnter() {
-            browser.actions().sendKeys(protractor.Key.ENTER).perform();
+        async clickByCoordinates(xPos, yPos) {
+            await browser.actions().mouseMove(this.waitReady(), {x: xPos, y: yPos}).click().perform();
             return this;
         },
 
-        pressHome() {
-            browser.actions().sendKeys(protractor.Key.HOME).perform();
+        async clickXTimes(repeatNumber) {
+            for (let i = 0; i < repeatNumber; i++) {
+                await this.clickAndWait();
+            }
             return this;
         },
 
-        pressTab() {
-            browser.actions().sendKeys(protractor.Key.TAB).perform();
+        async doubleClick() {
+            await browser.actions().doubleClick().perform();
             return this;
         },
 
-        pressUp() {
-            browser.actions().sendKeys(protractor.Key.UP).perform();
+        async pasteFromClipboard(value) {
+            await buffer.copy(value);
+            await this.clickReady();
+            await base.sleep(base.timeout.min);
+            await browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
+        },
+
+        async pressEnter() {
+            await browser.actions().sendKeys(protractor.Key.ENTER).perform();
             return this;
         },
 
-        pressDown() {
-            browser.actions().sendKeys(protractor.Key.DOWN).perform();
+        async pressHome() {
+            await browser.actions().sendKeys(protractor.Key.HOME).perform();
             return this;
         },
-        
-        getTextReady() {
+
+        async pressTab() {
+            await browser.actions().sendKeys(protractor.Key.TAB).perform();
+            return this;
+        },
+
+        async pressUp() {
+            await browser.actions().sendKeys(protractor.Key.UP).perform();
+            return this;
+        },
+
+        async pressDown() {
+            await browser.actions().sendKeys(protractor.Key.DOWN).perform();
+            return this;
+        },
+
+        async getTextReady() {
             return this.waitReady().getText();
         },
 
-        scrollAndGetTextList(list, scrolledElements, scrollCount) {
-            browser.executeScript('arguments[0].scrollIntoView(false);', scrolledPanel);
+        async scrollAndGetTextList(list, scrolledPanel, scrolledElements, scrollCount) {
+            browser.executeScript(`arguments[0].scrollIntoView(false);`, scrolledPanel);
             return this.getTextList().then((newList) => {
                 if (scrollCount > 0) {
-                    return this.scrollAndGetTextList(_.union(list, newList), scrolledElements, scrollCount - 1);
+                    return this.scrollAndGetTextList(_.union(list, newList), scrolledPanel, scrolledElements, scrollCount - 1);
                 } else {
                     return _.union(list, newList);
                 }
             });
         },
 
-        getTextListAtScrolled(scrolledElements, scrollCount) {
+        async getTextListAtScrolled(scrolledElements, scrollCount) {
             return scrolledElements.getTextList().then((list) => {
-                return this.scrollAndGetTextList(list, scrolledElements, scrollCount)
+                return this.scrollAndGetTextList(list, this, scrolledElements, scrollCount)
             });
-
         }
 
     });
-})();
-(function () {
+})
+();
+(() => {
     let ElementFinder = $('').constructor;
     const base = new Base();
 
     Object.assign(ElementFinder.prototype, {
 
         asCheckBox() {
-            let root = this;
             return {
-                get() {
-                    return root;
+                async get() {
+                    return this;
                 },
-                check() {
-                    root.isSelected().then((result) => {
-                        if (!result) {
-                            root.clickScript();
-                        }
-                    });
+                async check() {
+                    if (!this.isChecked()) {
+                        this.clickScript();
+                    }
                 },
-                uncheck() {
-                    root.isSelected().then((result) => {
-                        if (result) {
-                            root.clickScript();
-                        }
-                    });
+                async uncheck() {
+                    if (this.isChecked()) {
+                        this.clickScript();
+                    }
                 },
-                isChecked() {
-                    return root.isSelected().then((result) => {
-                        return result
-                    });
+                async isChecked() {
+                    return this.isSelected();
                 }
             };
         }
     });
 })();
-(function () {
-    let ElementArrayFinder = $$('').constructor;
+(() => {
+    let ElementArrayFinder = $$(``).constructor;
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
@@ -749,6 +820,18 @@ module.exports = new Base();
             this.getTextList().should.eventually.include.members(membersList, msg || `check that text list include members: ${this.locator()}`);
         },
 
+        checkTextListAllBeOneOf(membersList, msg) {
+            this.getTextList().should.eventually.all.be.oneOf(membersList, msg || `check list include members: ` + this.locator());
+        },
+
+        checkTextListNotIncludeMember(member, msg) {
+            this.getTextList().should.eventually.not.include(member, msg || `check list not include member: ` + this.locator());
+        },
+
+        checkTextListNotIncludeMembers(membersList, msg) {
+            this.getTextList().should.eventually.not.include.members(membersList, msg || `check list not include members: ` + this.locator());
+        },
+
         checkTextListHaveMembers(membersList, msg) {
             this.getTextList().should.eventually.have.members(membersList, msg || `check that text list have members: ${this.locator()}`);
         },
@@ -765,12 +848,20 @@ module.exports = new Base();
             }
         },
 
+        checkListNotMatch(regexp, msg, lowerCase) {
+            if (lowerCase) {
+                this.getTextListLowerCase().should.eventually.not.match(regexp, msg || `check list not match: ` + this.locator());
+            } else {
+                this.getTextList().should.eventually.not.match(regexp, msg || `check list not match: ` + this.locator());
+            }
+        },
+
         checkSortAscending(compareFn, limit) {
             this.getTextListLimit(limit).then((unSorted) => {
                 unSorted = unSorted.filter(Boolean);
                 let sorted = unSorted.slice();
                 sorted = compareFn ? sorted.sort(compareFn) : sorted.sort();
-                sorted.should.deep.equal(unSorted, 'check Ascending');
+                sorted.should.deep.equal(unSorted, `check Ascending`);
             });
         },
 
@@ -779,23 +870,32 @@ module.exports = new Base();
                 unSorted = unSorted.filter(Boolean);
                 let sorted = unSorted.slice();
                 sorted = compareFn ? sorted.sort(compareFn) : sorted.sort();
-                sorted.reverse().should.deep.equal(unSorted, 'check Descending');
+                sorted.reverse().should.deep.equal(unSorted, `check Descending`);
+            });
+        },
+
+        checkTextMatch(regexp) {
+            this.map((elm) => {
+                elm.getText().then((val) => {
+                    // console.log(val.trim());
+                    val.should.match(regexp);
+                });
             });
         }
 
     });
 })();
-(function () {
+(() => {
     let ElementArrayFinder = $$('').constructor;
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
-        waitInDom(timeout) {
+        async waitInDom(timeout) {
             browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
             return this;
         },
 
-        isDisplayedOneOf() {
+        async isDisplayedOneOf() {
             return this.filter((el) => {
                 return el.isDisplayed();
             }).count().then((count) => {
@@ -803,7 +903,7 @@ module.exports = new Base();
             });
         },
 
-        isPresentOneOf() {
+        async isPresentOneOf() {
             return this.filter((el) => {
                 return el.isPresent();
             }).count().then((count) => {
@@ -811,13 +911,13 @@ module.exports = new Base();
             });
         },
 
-        waitReady(timeout) {
+        async waitReady(timeout) {
             this.waitInDom();
             browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, `wait for visible one of: ${this.locator()}`);
             return this;
         },
 
-        waitAllInvisible() {
+        async waitAllInvisible() {
             this.filter((el) => {
                 return el.isPresent()
             }).each((el) => {
@@ -825,43 +925,43 @@ module.exports = new Base();
             });
         },
 
-        waitAllNotInDom() {
+        async waitAllNotInDom() {
             element(this.locator()).waitNotInDom();
         },
 
-        slice(begin, end) {
+        async slice(begin, end) {
             return this.then((elements) => {
                 return elements.slice(begin, end);
             });
         },
 
-        getParents() {
+        async getParents() {
             return this.all(By.xpath('./..'));
         },
 
-        getFirstVisible() {
+        async getFirstVisible() {
             this.waitReady();
             return this.filter((el) => {
                 return el.isDisplayed();
             }).first();
         },
 
-        getLastVisible() {
+        async getLastVisible() {
             this.waitReady();
             return this.filter((el) => {
                 return el.isDisplayed();
             }).last();
         },
 
-        clickAtFirstVisible() {
+        async clickAtFirstVisible() {
             this.getFirstVisible().click();
         },
 
-        clickAtLastVisible() {
+        async clickAtLastVisible() {
             this.getLastVisible().click();
         },
 
-        getTextList(trim) {
+        async getTextList(trim) {
             return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return trim ? val.trim() : val;
@@ -869,9 +969,9 @@ module.exports = new Base();
             });
         },
 
-        getTextListLimit(limit, trim) {
+        async getTextListLimit(limit, trim) {
             return this.map((elm, i) => {
-                if (!limit || i<limit) {
+                if (!limit || i < limit) {
                     return elm.getText().then((val) => {
                         return trim ? val.trim() : val;
                     });
@@ -879,7 +979,15 @@ module.exports = new Base();
             });
         },
 
-        getTextListLowerCase() {
+        async getTextListNorm() {
+            return this.map((elm) => {
+                return elm.getText().then((val) => {
+                    return val.replace(/\n/g, ' ');
+                });
+            });
+        },
+
+        async getTextListLowerCase() {
             return this.map((elm) => {
                 return elm.getText().then((val) => {
                     return val.trim().toLowerCase();
@@ -887,15 +995,23 @@ module.exports = new Base();
             });
         },
 
-        getTextListSubstring(char) {
+        async getTextListSubstring(char) {
             return this.map((elm) => {
-                return elm.getText().then((val) =>{
+                return elm.getText().then((val) => {
                     return val.split(char)[0].trim();
                 });
             });
         },
 
-        getAttributeList(attribute) {
+        async getIntList() {
+            return this.map((elm) => {
+                return elm.getText().then((val) => {
+                    return parseInt(val.trim());
+                });
+            });
+        },
+
+        async getAttributeList(attribute) {
             return this.map((elm) => {
                 return elm.getAttribute(attribute).then((val) => {
                     return val.trim();
@@ -903,91 +1019,90 @@ module.exports = new Base();
             });
         },
 
-        getAllByText(text) {
+        async getAllByText(text) {
             return this.all(By.xpath(`./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]`));
         },
 
-        getFirstByText(text) {
+        async getFirstByText(text) {
             return this.getAllByText(text).getFirstVisible();
         },
 
-        clickFirstByText(text) {
+        async clickFirstByText(text) {
             return this.getAllByText(text).clickAtFirstVisible();
         },
 
-        getAllByTextContains(text) {
+        async getAllByTextContains(text) {
             return this.all(By.xpath(`./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]`));
         },
 
-        getFirstByTextContains(text) {
+        async getFirstByTextContains(text) {
             return this.getAllByTextContains(text).getFirstVisible();
         },
 
-        clickFirstByTextContains(text) {
+        async clickFirstByTextContains(text) {
             return this.getAllByTextContains(text).clickAtFirstVisible();
         },
 
-        clickAtLink(text) {
+        async clickAtLink(text) {
             return this.all(By.linkText(text)).first().click();
         },
 
-        getReadyFirst() {
+        async getReadyFirst() {
             this.waitReady();
             return this.first();
         },
 
-        clickReadyFirst() {
+        async clickReadyFirst() {
             this.getReadyFirst().click();
         },
 
-        getReadyLast() {
+        async getReadyLast() {
             this.waitReady();
             return this.last();
         },
 
-        clickReadyLast() {
+        async clickReadyLast() {
             this.getReadyLast().click();
         },
 
-        getReadyByIndex(index) {
+        async getReadyByIndex(index) {
             this.waitReady();
             return this.get(index).waitReady();
         }
 
     });
 })();
-(function () {
+(() => {
     let ElementArrayFinder = $$('').constructor;
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
         asRadio() {
-            let root = this;
             let labels = this.getParents();
             return {
-                get() {
-                    return root;
+                async get() {
+                    return this;
                 },
-                getNames() {
+                async getNames() {
                     return labels.getTextList();
                 },
-                isSelectedByName(name) {
+                async isSelectedByName(name) {
                     return labels.getFirstByTextContains(name).$('input').isSelected();
                 },
-                getByName(name) {
+                async getByName(name) {
                     return labels.getFirstByText(name);
                 },
-                getByNameContains(name) {
+                async getByNameContains(name) {
                     return labels.getFirstByTextContains(name);
                 },
-                selectByName(name) {
-                    labels.clickFirstByText(name);
+                async selectByName(name) {
+                    await labels.clickFirstByText(name);
                 },
-                selectByNameContains(name) {
-                    labels.clickFirstByTextContains(name);
+                async selectByNameContains(name) {
+                    await labels.clickFirstByTextContains(name);
                 },
-                selectByIndex(index) {
-                    labels.get(index).click();
+                async selectByIndex(index) {
+                    await labels.get(index).click();
                 }
             }
         }
@@ -996,7 +1111,7 @@ module.exports = new Base();
 /**
  * Custom locators.
  */
-(function () {
+(() => {
 
     By.addLocator('cssHasText', (cssEl, text, opt_parentElement) => {
         let using = opt_parentElement || document;
@@ -1036,71 +1151,77 @@ module.exports = new Base();
         let using = opt_parentElement || document;
         let els = using.querySelectorAll(cssEl);
         return Array.prototype.filter.call(els, (el) => {
-            return el.innerHTML.indexOf(`>${text}<`) >= 0;
+            return el.innerHTML.indexOf('>' + text + '<') >= 0 || el.innerHTML.replace(/([\r\n\t])/g, '').search(new RegExp('>(\\s*)' + text.replace('(', '\\(').replace(')', '\\)') + '(\\s*)<', 'g')) >= 0;
         });
     });
 })();
 /**
  * Utils.
  */
-(function () {
+(() => {
     Object.assign(Array.prototype, {
 
-        contains (it) {
-            return this.indexOf(it) > -1;
+            contains(it) {
+                return this.indexOf(it) > -1;
+            },
+
+            containsOneOf(arr) {
+                var found = false;
+                this.forEach((it) => {
+                    if (arr.indexOf(it) > -1) {
+                        found = true;
+                    }
+                });
+                return found;
+            },
+
+            toLowerCase() {
+                return this.map((el) => {
+                    return el.toLowerCase();
+                });
+            },
+
+            toUpperCase() {
+                return this.map((el) => {
+                    return el.toUpperCase();
+                });
+            },
+
+            removeEmpty() {
+                return this.filter((el) => {
+                    return !el.isEmpty();
+                });
+            }
         },
 
-        containsOneOf(arr) {
-            var found = false;
-            this.forEach(function (it) {
-                if (arr.indexOf(it) > -1) {
-                    found = true;
-                }
-            });
-            return found;
-        },
+        Object.assign(String.prototype, {
 
-        toLowerCase() {
-            return this.map(function (el) {
-                return el.toLowerCase();
-            });
-        },
+            contains(it) {
+                return this.indexOf(it) !== -1;
+            },
 
-        removeEmpty() {
-            return this.filter(function (el) {
-                return !el.isEmpty();
-            });
-        }
-    },
+            containsOneOf(arr) {
+                var found = false;
+                var text = this;
+                arr.forEach((it) => {
+                    if (text.contains(it)) {
+                        found = true;
+                    }
+                });
+                return found;
+            },
 
-    Object.assign(String.prototype, {
+            format() {
+                var args = arguments;
+                var i = -1;
+                return this.replace(/\{(?:[^{}]|\{*\})*\}/g, (val) => {
+                    i++;
+                    return args[i] !== undefined ? args[i] : val;
+                });
+            },
 
-        contains(it) {
-            return this.indexOf(it) !== -1;
-        },
-
-        containsOneOf(arr) {
-            var found = false;
-            var text = this;
-            arr.forEach(function (it) {
-                if (text.contains(it)) {
-                    found = true;
-                }
-            });
-            return found;
-        },
-
-        format() {
-            var args = arguments;
-            var i = -1;
-            return this.replace(/\{(?:[^{}]|\{*\})*\}/g, function (val) {
-                i++;
-                return args[i] !== undefined ? args[i] : val;
-            });
-        },
-
-        getDigits() {
-            return this.match(/\d+/)[0]
-        }
-    }))
+            getDigits() {
+                return this.match(/\d+/)[0]
+            }
+        }))
 })();

@@ -1,7 +1,7 @@
 /**
  * Custom locators.
  */
-(function () {
+(() => {
 
     By.addLocator('cssHasText', (cssEl, text, opt_parentElement) => {
         let using = opt_parentElement || document;

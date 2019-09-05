@@ -1,4 +1,4 @@
-(function () {
+(() => {
     let ElementFinder = $('').constructor;
     const base = new Base();
 
@@ -20,7 +20,7 @@
                     }
                 },
                 async isChecked() {
-                    return await this.isSelected();
+                    return this.isSelected();
                 }
             };
         }
