@@ -9,26 +9,26 @@
                 get() {
                     return this;
                 },
-                getNames() {
-                    return labels.getTextList();
+                async getNames() {
+                    return await labels.getTextList();
                 },
-                isSelectedByName(name) {
-                    return labels.getFirstByTextContains(name).$('input').isSelected();
+                async isSelectedByName(name) {
+                    return await labels.getFirstByTextContains(name).$('input').isSelected();
                 },
-                getByName(name) {
-                    return labels.getFirstByText(name);
+                async getByName(name) {
+                    return await labels.getFirstByText(name);
                 },
-                getByNameContains(name) {
-                    return labels.getFirstByTextContains(name);
+                async getByNameContains(name) {
+                    return await labels.getFirstByTextContains(name);
                 },
-                selectByName(name) {
-                    labels.clickFirstByText(name);
+                async selectByName(name) {
+                    await labels.clickFirstByText(name);
                 },
-                selectByNameContains(name) {
-                    labels.clickFirstByTextContains(name);
+                async selectByNameContains(name) {
+                    await labels.clickFirstByTextContains(name);
                 },
-                selectByIndex(index) {
-                    labels.get(index).click();
+                async selectByIndex(index) {
+                    await labels.get(index).click();
                 }
             }
         }

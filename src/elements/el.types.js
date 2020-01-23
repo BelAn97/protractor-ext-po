@@ -9,14 +9,14 @@
                 get() {
                     return this;
                 },
-                check() {
-                    if (!this.isChecked()) {
-                        this.clickScript();
+                async check() {
+                    if (!await this.isChecked()) {
+                        await this.clickScript();
                     }
                 },
-                uncheck() {
-                    if (this.isChecked()) {
-                        this.clickScript();
+                async uncheck() {
+                    if (await this.isChecked()) {
+                        await  this.clickScript();
                     }
                 },
                 isChecked() {

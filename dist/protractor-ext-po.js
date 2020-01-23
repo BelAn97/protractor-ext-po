@@ -42,23 +42,17 @@ class Base {
         this.download = download;
     };
 
-    debug() {
-        flow.execute(() => {
-            console.log(`debug`);
-            browser.debugger();
-        });
+    async debug() {
+        console.log(`debug`);
+        await browser.debugger();
     };
 
-    setWaitForAngularEnabled() {
-        flow.execute(() => {
-            browser.waitForAngularEnabled(true);
-        });
+    async setWaitForAngularEnabled() {
+        await browser.waitForAngularEnabled(true);
     };
 
-    setWaitForAngularDisabled() {
-        flow.execute(() => {
-            browser.waitForAngularEnabled(false);
-        });
+    async setWaitForAngularDisabled() {
+        await browser.waitForAngularEnabled(false);
     };
 
     /**
@@ -67,20 +61,16 @@ class Base {
      * @requires page to include `angular` boolean variable
      */
     checkWaitForAngular() {
-        if (this.angular !== undefined) {
-            if (this.angular) {
-                this.setWaitForAngularEnabled();
-            } else {
-                this.setWaitForAngularDisabled();
-            }
+        if (this.angular) {
+            this.setWaitForAngularEnabled();
+        } else {
+            this.setWaitForAngularDisabled();
         }
     };
 
-    sleep(ms) {
-        flow.execute(() => {
-            console.log(`*sleep: ${ms} ms`);
-            browser.sleep(ms);
-        });
+    async sleep(ms) {
+        console.log(`*sleep: ${ms} ms`);
+        await browser.sleep(ms);
     };
 
     pause() {
@@ -89,46 +79,44 @@ class Base {
 
     log(value) {
         if (!!value) {
-            flow.execute(() => {
-                console.log(value);
-            });
+            console.log(value);
         }
     };
 
-    logTitle() {
-        browser.getTitle().then((title) => {
+    async logTitle() {
+        await browser.getTitle().then((title) => {
             this.log(`Title: ${title}`);
         });
     };
 
-    waitForTitle(expected, timeout) {
-        browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, `Waiting for title: ${expected}`);
+    async waitForTitle(expected, timeout) {
+        await browser.wait(this.EC.titleIs(expected), timeout || this.timeout.xxl, `Waiting for title: ${expected}`);
     };
 
-    waitForTitleContains(expected, timeout) {
-        browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, `Wait for title contains: ${expected}`);
+    async waitForTitleContains(expected, timeout) {
+        await browser.wait(this.EC.titleContains(expected), timeout || this.timeout.xxl, `Wait for title contains: ${expected}`);
     };
 
-    waitForUrl(expected, timeout) {
-        browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, `Waiting for url: ${expected}`);
+    async waitForUrl(expected, timeout) {
+        await browser.wait(this.EC.urlIs(expected), timeout || this.timeout.xxl, `Waiting for url: ${expected}`);
     };
 
-    waitForUrlContains(expected, timeout) {
-        browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, `Wait for url contains: ${expected}`);
+    async waitForUrlContains(expected, timeout) {
+        await browser.wait(this.EC.urlContains(expected), timeout || this.timeout.xxl, `Wait for url contains: ${expected}`);
     };
 
-    waitForAlert(timeout) {
-        browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, `Waiting for alert`);
+    async waitForAlert(timeout) {
+        await browser.wait(this.EC.alertIsPresent(), timeout || this.timeout.xxl, `Waiting for alert`);
     };
 
-    waitFile(filePath, timeout) {
-        browser.wait(() => {
+    async waitFile(filePath, timeout) {
+        await browser.wait(() => {
             return fs.existsSync(filePath)
         }, timeout || this.timeout.xxxl, `Wait File: ${filePath}`);
     };
 
-    waitFileGone(filePath, timeout) {
-        browser.wait(() => {
+    async waitFileGone(filePath, timeout) {
+        await browser.wait(() => {
             return !fs.existsSync(filePath)
         }, timeout || this.timeout.xxl, `Wait File Gone: ${filePath}`);
     };
@@ -138,12 +126,10 @@ class Base {
      *
      * @requires page to include `loaded` webElement
      */
-    at(timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.logTitle();
-            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Page: ` + (this.url || ``));
-        });
+    async at(timeout) {
+        await this.checkWaitForAngular();
+        await this.logTitle();
+        await browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Page: ` + (this.url || ``));
     };
 
     /**
@@ -151,11 +137,9 @@ class Base {
      *
      * @requires page to include `loaded` webElement
      */
-    atFrame(timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Frame: ${this.iframe}`);
-        });
+    async atFrame(timeout) {
+        await this.checkWaitForAngular();
+        await browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Frame: ${this.iframe}`);
     };
 
     /**
@@ -163,18 +147,14 @@ class Base {
      *
      * @requires page to include `url` variable
      */
-    atUrl(url, timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.waitForUrl(url || this.url, timeout);
-        });
+    async atUrl(url, timeout) {
+        await this.checkWaitForAngular();
+        await this.waitForUrl(url || this.url, timeout);
     };
 
-    atUrlContains(url, timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.waitForUrlContains(url || this.url, timeout);
-        });
+    async atUrlContains(url, timeout) {
+        await this.checkWaitForAngular();
+        await this.waitForUrlContains(url || this.url, timeout);
     };
 
     /**
@@ -182,18 +162,14 @@ class Base {
      *
      * @requires page to include `title` variable
      */
-    atTitle(title, timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.waitForTitle(title || this.title, timeout);
-        });
+    async atTitle(title, timeout) {
+        await this.checkWaitForAngular();
+        await this.waitForTitle(title || this.title, timeout);
     };
 
-    atTitleContains(title, timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.waitForTitleContains(title || this.title, timeout);
-        });
+    async atTitleContains(title, timeout) {
+        await this.checkWaitForAngular();
+        await this.waitForTitleContains(title || this.title, timeout);
     };
 
     /**
@@ -202,183 +178,168 @@ class Base {
      *
      * @requires page have both `url` and `loaded` properties
      */
-    goTo() {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.log(`*goTo: ${base.domain + this.url}`);
-            browser.navigate().to(base.domain + this.url);
-            this.at();
-        });
+    async goTo() {
+        await this.checkWaitForAngular();
+        await this.log(`*goTo: ${base.domain + this.url}`);
+        await browser.navigate().to(base.domain + this.url);
+        await this.at();
     };
 
-    goToUrl(url) {
-        flow.execute(() => {
-            url = url || base.domain + this.url;
-            this.log(`*goTo url: ${url}`);
-            browser.navigate().to(url);
-            this.pause();
-        });
+    async goToUrl(url) {
+        url = url || base.domain + this.url;
+        await this.log(`*goTo url: ${url}`);
+        await browser.navigate().to(url);
+        await this.pause();
     };
 
-    goToPath(path) {
-        flow.execute(() => {
-            this.log(`*goTo path: ` + base.domain + path);
-            browser.get(base.domain + path);
-        });
+    async goToPath(path) {
+        await this.log(`*goTo path: ` + base.domain + path);
+        await browser.get(base.domain + path);
     };
 
-    saveCurrentUrl() {
-        browser.getCurrentUrl().then((currentUrl) => {
+    async saveCurrentUrl() {
+        await browser.getCurrentUrl().then((currentUrl) => {
             this.log(`*save url: ${currentUrl}`);
             this.savedUrl = currentUrl;
         });
     };
 
-    goToSavedUrl() {
-        flow.execute(() => {
-            this.log(`*goTo saved url: ${this.savedUrl}`);
-            browser.navigate().to(this.savedUrl);
-            this.pause();
-        });
+    async goToSavedUrl() {
+        await this.log(`*goTo saved url: ${this.savedUrl}`);
+        await browser.navigate().to(this.savedUrl);
+        await this.pause();
     };
 
-    restart() {
-        this.log(`*restart`);
-        browser.restartSync();
+    async restart() {
+        await this.log(`*restart`);
+        await browser.restartSync();
     };
 
-    refresh() {
-        this.log(`*refresh`);
-        browser.refresh();
+    async refresh() {
+        await this.log(`*refresh`);
+        await browser.refresh();
     };
 
-    resetSession() {
-        this.log(`*resetSession`);
-        browser.driver.manage().deleteAllCookies().then(() => {
+    async resetSession() {
+        await this.log(`*resetSession`);
+        await browser.driver.manage().deleteAllCookies().then(() => {
             browser.executeScript(`window.localStorage.clear(); window.sessionStorage.clear();`);
             browser.refresh();
         })
     };
 
-    goBack() {
-        this.log(`*goBack`);
-        flow.execute(() => {
-            this.pause();
-            browser.navigate().back();
-            this.pause();
-        });
+    async goBack() {
+        await this.log(`*goBack`);
+        await this.pause();
+        await browser.navigate().back();
+        await this.pause();
     };
 
-    goForward() {
-        this.log(`*goForward`);
-        flow.execute(() => {
-            this.pause();
-            browser.navigate().forward();
-            this.pause();
-        });
+    async goForward() {
+        await this.log(`*goForward`);
+        await this.pause();
+        await browser.navigate().forward();
+        await this.pause();
     };
 
-    switchToWindow(windowHandleIndex) {
-        this.setWaitForAngularDisabled();
-        browser.getAllWindowHandles().then((handles) => {
+    async switchToWindow(windowHandleIndex) {
+        await this.setWaitForAngularDisabled();
+        await browser.getAllWindowHandles().then((handles) => {
             return browser.switchTo().window(handles[windowHandleIndex]);
         });
     };
 
-    switchToDefault() {
-        this.setWaitForAngularDisabled();
-        flow.execute(() => {
-            browser.switchTo().defaultContent().then(
-                () => {
-                }, (err) => {
-                    console.log(err);
-                }
-            );
-        });
+    async switchToDefault() {
+        await this.setWaitForAngularDisabled();
+        await browser.switchTo().defaultContent().then(
+            () => {
+            }, (err) => {
+                console.log(err);
+            }
+        );
     };
 
-    switchToDefaultState() {
-        this.setWaitForAngularDisabled();
-        flow.execute(() => {
-            browser.switchTo().defaultContent().then(() => {
-                    browser.getAllWindowHandles().then((handles) => {
-                        for (let i = 1; i < handles.length; i++) {
-                            browser.switchTo().window(handles[i]);
-                            browser.close();
-                        }
-                    });
-                },
-                (err) => {
-                    console.log(err);
-                    browser.restart();
-                    browser.switchTo().activeElement();
-                }
-            );
-        });
+    async switchToDefaultState() {
+        await this.setWaitForAngularDisabled();
+        await browser.switchTo().defaultContent().then(async () => {
+                await browser.getAllWindowHandles().then(async (handles) => {
+                    for (let i = 1; i < handles.length; i++) {
+                        await browser.switchTo().window(handles[i]);
+                        await browser.close();
+                    }
+                });
+            },
+            async (err) => {
+                console.log(err);
+                await browser.restart();
+                await browser.switchTo().activeElement();
+            }
+        );
+
     };
 
-    switchToNew(currentWinHandle) {
-        this.pause();
-        this.setWaitForAngularDisabled();
-        browser.getAllWindowHandles().then((handles) => {
+    async switchToNew(currentWinHandle) {
+        await this.pause();
+        await this.setWaitForAngularDisabled();
+        await browser.getAllWindowHandles().then(async (handles) => {
             if (!!currentWinHandle) {
-                return browser.switchTo().window(handles.filter((handle) => {
+                return await browser.switchTo().window(handles.filter((handle) => {
                     return handle !== currentWinHandle
                 })[0]);
             } else {
-                return browser.switchTo().window(handles[1]);
+                return await browser.switchTo().window(handles[1]);
             }
         });
     };
 
-    switchCloseWindow() {
-        browser.close();
-        this.setWaitForAngularDisabled();
-        browser.getAllWindowHandles().then((handles) => {
+    async switchCloseWindow() {
+        await browser.close();
+        await this.setWaitForAngularDisabled();
+        await browser.getAllWindowHandles().then(async (handles) => {
             if (handles.length > 1) {
-                browser.close();
-                return base.switchToWindow(0);
+                await browser.close();
+                return await this.switchToWindow(0);
             }
             return handles[0];
         });
     };
 
-    switchToFrame(nameOrIndex) {
-        browser.switchTo().defaultContent();
+    async switchToFrame(nameOrIndex) {
+        await browser.switchTo().defaultContent();
         if (!nameOrIndex) {
-            this.iframe.waitInDom();
-            nameOrIndex = this.iframe.getWebElement();
+            await this.iframe.waitInDom();
+            nameOrIndex = await this.iframe.getWebElement();
         }
-        this.setWaitForAngularDisabled();
-        browser.switchTo().frame(nameOrIndex).then(() => {
-            return this.atFrame();
+        await this.setWaitForAngularDisabled();
+        await browser.switchTo().frame(nameOrIndex).then(async () => {
+            return await this.atFrame();
         });
     };
 
     /**
      * WebDriver actions.
      */
-    hitReturn() {
-        browser.actions().sendKeys(protractor.Key.RETURN).perform();
+    async hitReturn() {
+        await browser.actions().sendKeys(protractor.Key.RETURN).perform();
     };
 
-    hitSpace() {
-        browser.actions().sendKeys(protractor.Key.SPACE).perform();
+    async hitSpace() {
+        await browser.actions().sendKeys(protractor.Key.SPACE).perform();
     };
 
-    hitTab() {
-        browser.actions().sendKeys(protractor.Key.TAB).perform();
+    async hitTab() {
+        await browser.actions().sendKeys(protractor.Key.TAB).perform();
     };
 
-    hitEscape() {
-        browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+    async hitEscape() {
+        await browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
     };
 
     /**
      * WebDriver alerts.
      */
-    isAlertPresent() {
-        return browser.getTitle().then(
+    async isAlertPresent() {
+        return await browser.getTitle().then(
             () => {
                 return false;
             }, () => {
@@ -387,23 +348,23 @@ class Base {
         );
     };
 
-    acceptAlert() {
-        if (base.isAlertPresent()) {
-            browser.switchTo().alert().then((alert) => {
+    async acceptAlert() {
+        if (await this.isAlertPresent()) {
+            await browser.switchTo().alert().then(async (alert) => {
                     this.log("Accept alert");
-                    alert.accept();
+                    await alert.accept();
                 }, (err) => {
                 }
             );
         }
     };
 
-    checkAlert(message) {
-        this.waitForAlert();
-        browser.switchTo().alert().then((alert) => {
-                alert.getText().should.eventually.eq(message);
-                this.log("Accept alert");
-                alert.accept();
+    async checkAlert(message) {
+        await this.waitForAlert();
+        await browser.switchTo().alert().then(async (alert) => {
+                await alert.getText().should.eventually.eq(message);
+                await this.log("Accept alert");
+                await alert.accept();
             }, (err) => {
             }
         );
@@ -465,6 +426,7 @@ class Base {
 }
 
 module.exports = new Base();
+
 (() => {
     let ElementFinder = $(``).constructor;
     const base = new Base();
@@ -550,211 +512,212 @@ module.exports = new Base();
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
 
-        waitInDom(timeout) {
-            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
+        async waitInDom(timeout) {
+            await browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
             return this;
         },
 
-        waitNotInDom(timeout) {
-            browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, `wait not in dom: ${this.locator()}`);
+        async waitNotInDom(timeout) {
+            await browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, `wait not in dom: ${this.locator()}`);
             return this;
         },
 
-        waitReady(timeout) {
-            browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, `wait for visible: ${this.locator()}`);
+        async waitReady(timeout) {
+            await browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, `wait for visible: ${this.locator()}`);
             return this;
         },
 
-        waitInvisible(timeout) {
-            browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, `wait for invisible: ${this.locator()}`);
+        async waitInvisible(timeout) {
+            await browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, `wait for invisible: ${this.locator()}`);
             return this;
         },
 
-        waitClickable(timeout) {
-            browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, `wait clickable: ${this.locator()}`);
+        async waitClickable(timeout) {
+            await browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, `wait clickable: ${this.locator()}`);
             return this;
         },
 
-        waitForText(text, timeout) {
-            browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, `wait for text: ${this.locator()}`);
+        async waitForText(text, timeout) {
+            await browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, `wait for text: ${this.locator()}`);
             return this;
         },
 
-        waitForValue(value, timeout) {
-            browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, `wait for value: ${this.locator()}`);
+        async waitForValue(value, timeout) {
+            await browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, `wait for value: ${this.locator()}`);
             return this;
         },
 
-        getParent() {
-            return this.element(By.xpath(`./..`));
+        async getParent() {
+            return await this.element(By.xpath(`./..`));
         },
 
-        getValue() {
+        async getValue() {
             return this.getAttribute(`value`);
         },
 
-        hasClass(klass) {
-            return this.getAttribute(`class`).then((classes) => {
+        async hasClass(klass) {
+            return await this.getAttribute(`class`).then((classes) => {
                 base.log(`class attribute: ${classes}`);
                 return classes.split(` `).indexOf(klass) !== -1;
             });
         },
 
-        getInt() {
-            return this.getTextReady().then((text) => {
+        async getInt() {
+            return await this.getTextReady().then((text) => {
                 return parseInt(text.match(/\d+/)[0]);
             });
         },
 
-        getWidth() {
-            return this.getSize().then((size) => {
+        async getWidth() {
+            return await this.getSize().then((size) => {
                 return size.width;
             });
         },
 
-        getNumber() {
-            return this.getTextReady().then((text) => {
+        async getNumber() {
+            return await this.getTextReady().then((text) => {
                 return parseFloat(text);
             });
         },
 
-        findByText(searchText) {
-            return this.element(By.xpath(`.//*[text()="${searchText}"]`));
+        async findByText(searchText) {
+            return await this.element(By.xpath(`.//*[text()="${searchText}"]`));
         },
 
-        focus() {
-            browser.actions().mouseMove(this.waitReady()).perform();
+        async focus() {
+            await browser.actions().mouseMove(this.waitReady()).perform();
             return this;
         },
 
-        focusBy(xCoordinate, yCoordinate) {
-            browser.actions().mouseMove(this.waitReady(), {x: xCoordinate, y: yCoordinate}).perform();
+        async focusBy(xCoordinate, yCoordinate) {
+            await browser.actions().mouseMove(this.waitReady(), {x: xCoordinate, y: yCoordinate}).perform();
             return this;
         },
 
-        focusClick() {
-            return this.focus().clickReady();
+        async focusClick() {
+            return await this.focus().clickReady();
         },
 
-        clearAndSetText(text) {
-            let input = this.waitReady();
-            input.clear().sendKeys(text);
+        async clearAndSetText(text) {
+            let input = await this.waitReady();
+            await input.clear().sendKeys(text);
             return this;
         },
 
-        sendKeysSlow(text, interval) {
-            let input = this.waitReady();
-            text.split(``).forEach((char) => {
+        async sendKeysSlow(text, interval) {
+            let input = await this.waitReady();
+            await text.split(``).forEach((char) => {
                 input.sendKeys(char);
                 base.sleep(interval || base.timeout.zero);
             });
             return this;
         },
 
-        clickReady() {
-            this.waitClickable().click();
+        async clickReady() {
+            await this.waitClickable().click();
         },
 
-        clickByScript() {
-            this.waitInDom();
-            browser.executeScript(`arguments[0].click();`, this);
+        async clickByScript() {
+            await this.waitInDom();
+            await browser.executeScript(`arguments[0].click();`, this);
             return this;
         },
 
-        clickAndWaitInvisible() {
-            this.click();
-            this.waitInvisible();
+        async clickAndWaitInvisible() {
+            await this.click();
+            await this.waitInvisible();
         },
 
-        clickAtCenter() {
-            browser.actions().click(this.waitClickable()).perform();
+        async clickAtCenter() {
+            await browser.actions().click(this.waitClickable()).perform();
             return this;
         },
 
-        clickAtCorner() {
-            browser.actions().mouseMove(this.waitClickable(), {x: 1, y: 1}).click().perform();
+        async clickAtCorner() {
+            await browser.actions().mouseMove(this.waitClickable(), {x: 1, y: 1}).click().perform();
             return this;
         },
 
-        clickIfExists() {
-            if (this.isPresent() && this.isDisplayed()) {
+        async clickIfExists() {
+            if (await this.isPresent() && await this.isDisplayed()) {
                 this.click();
             }
         },
 
-        clickByCoordinates(xPos, yPos) {
-            browser.actions().mouseMove(this.waitReady(), {x: xPos, y: yPos}).click().perform();
+        async clickByCoordinates(xPos, yPos) {
+            await browser.actions().mouseMove(this.waitReady(), {x: xPos, y: yPos}).click().perform();
             return this;
         },
 
-        clickXTimes(repeatNumber) {
+        async clickXTimes(repeatNumber) {
             for (let i = 0; i < repeatNumber; i++) {
-                this.clickAndWait();
+                await this.clickReady();
             }
             return this;
         },
 
-        doubleClick() {
-            browser.actions().doubleClick().perform();
+        async doubleClick() {
+            await browser.actions().doubleClick().perform();
             return this;
         },
 
-        pasteFromClipboard(value) {
-            buffer.copy(value);
-            this.clickReady();
-            base.sleep(base.timeout.min);
-            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
+        async pasteFromClipboard(value) {
+            await buffer.copy(value);
+            await this.clickReady();
+            await base.sleep(base.timeout.min);
+            await browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
         },
 
-        pressEnter() {
-            browser.actions().sendKeys(protractor.Key.ENTER).perform();
+        async pressEnter() {
+            await browser.actions().sendKeys(protractor.Key.ENTER).perform();
             return this;
         },
 
-        pressHome() {
-            browser.actions().sendKeys(protractor.Key.HOME).perform();
+        async pressHome() {
+            await browser.actions().sendKeys(protractor.Key.HOME).perform();
             return this;
         },
 
-        pressTab() {
-            browser.actions().sendKeys(protractor.Key.TAB).perform();
+        async pressTab() {
+            await browser.actions().sendKeys(protractor.Key.TAB).perform();
             return this;
         },
 
-        pressUp() {
-            browser.actions().sendKeys(protractor.Key.UP).perform();
+        async pressUp() {
+            await browser.actions().sendKeys(protractor.Key.UP).perform();
             return this;
         },
 
-        pressDown() {
-            browser.actions().sendKeys(protractor.Key.DOWN).perform();
+        async pressDown() {
+            await browser.actions().sendKeys(protractor.Key.DOWN).perform();
             return this;
         },
 
-        getTextReady() {
+        async getTextReady() {
             return this.waitReady().getText();
         },
 
-        scrollAndGetTextList(list, scrolledPanel, scrolledElements, scrollCount) {
-            browser.executeScript(`arguments[0].scrollIntoView(false);`, scrolledPanel);
-            return this.getTextList().then((newList) => {
+        async scrollAndGetTextList(list, scrolledPanel, scrolledElements, scrollCount) {
+            await browser.executeScript(`arguments[0].scrollIntoView(false);`, scrolledPanel);
+            return await this.getTextList().then(async (newList) => {
                 if (scrollCount > 0) {
-                    return this.scrollAndGetTextList(_.union(list, newList), scrolledPanel, scrolledElements, scrollCount - 1);
+                    return await this.scrollAndGetTextList(_.union(list, newList), scrolledPanel, scrolledElements, scrollCount - 1);
                 } else {
                     return _.union(list, newList);
                 }
             });
         },
 
-        getTextListAtScrolled(scrolledElements, scrollCount) {
-            return scrolledElements.getTextList().then((list) => {
-                return this.scrollAndGetTextList(list, this, scrolledElements, scrollCount)
+        async getTextListAtScrolled(scrolledElements, scrollCount) {
+            return await scrolledElements.getTextList().then(async (list) => {
+                return await this.scrollAndGetTextList(list, this, scrolledElements, scrollCount)
             });
         }
 
     });
 })
 ();
+
 (() => {
     let ElementFinder = $('').constructor;
     const base = new Base();
@@ -766,14 +729,14 @@ module.exports = new Base();
                 get() {
                     return this;
                 },
-                check() {
-                    if (!this.isChecked()) {
-                        this.clickScript();
+                async check() {
+                    if (!await this.isChecked()) {
+                        await this.clickScript();
                     }
                 },
-                uncheck() {
-                    if (this.isChecked()) {
-                        this.clickScript();
+                async uncheck() {
+                    if (await this.isChecked()) {
+                        await  this.clickScript();
                     }
                 },
                 isChecked() {
@@ -783,6 +746,7 @@ module.exports = new Base();
         }
     });
 })();
+
 (() => {
     let ElementArrayFinder = $$(``).constructor;
     const base = new Base();
@@ -890,188 +854,189 @@ module.exports = new Base();
     const base = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
-        waitInDom(timeout) {
-            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
+        async waitInDom(timeout) {
+            await browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
             return this;
         },
 
-        isDisplayedOneOf() {
-            return this.filter((el) => {
-                return el.isDisplayed();
+        async isDisplayedOneOf() {
+            return await this.filter(async (el) => {
+                return await el.isDisplayed();
             }).count().then((count) => {
                 return count > 0;
             });
         },
 
-        isPresentOneOf() {
-            return this.filter((el) => {
-                return el.isPresent();
+        async isPresentOneOf() {
+            return await this.filter(async (el) => {
+                return await el.isPresent();
             }).count().then((count) => {
                 return count > 0;
             });
         },
 
-        waitReady(timeout) {
-            this.waitInDom();
-            browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, `wait for visible one of: ${this.locator()}`);
+        async waitReady(timeout) {
+            await this.waitInDom();
+            await browser.wait(this.isDisplayedOneOf(), timeout || base.timeout.xxl, `wait for visible one of: ${this.locator()}`);
             return this;
         },
 
-        waitAllInvisible() {
-            this.filter((el) => {
-                return el.isPresent()
-            }).each((el) => {
-                el.waitInvisible();
+        async waitAllInvisible() {
+            await this.filter(async (el) => {
+                return await el.isPresent()
+            }).each(async (el) => {
+                await el.waitInvisible();
             });
         },
 
-        waitAllNotInDom() {
-            element(this.locator()).waitNotInDom();
+        async waitAllNotInDom() {
+            await element(this.locator()).waitNotInDom();
         },
 
-        slice(begin, end) {
-            return this.then((elements) => {
+        async slice(begin, end) {
+            return await this.then((elements) => {
                 return elements.slice(begin, end);
             });
         },
 
-        getParents() {
-            return this.all(By.xpath('./..'));
+        async getParents() {
+            return await this.all(By.xpath('./..'));
         },
 
-        getFirstVisible() {
-            this.waitReady();
-            return this.filter((el) => {
-                return el.isDisplayed();
+        async getFirstVisible() {
+            await this.waitReady();
+            return await this.filter(async (el) => {
+                return await el.isDisplayed();
             }).first();
         },
 
-        getLastVisible() {
-            this.waitReady();
-            return this.filter((el) => {
-                return el.isDisplayed();
+        async getLastVisible() {
+            await this.waitReady();
+            return await this.filter(async (el) => {
+                return await el.isDisplayed();
             }).last();
         },
 
-        clickAtFirstVisible() {
-            this.getFirstVisible().click();
+        async clickAtFirstVisible() {
+            await this.getFirstVisible().click();
         },
 
-        clickAtLastVisible() {
-            this.getLastVisible().click();
+        async clickAtLastVisible() {
+            await this.getLastVisible().click();
         },
 
-        getTextList(trim) {
-            return this.map((elm) => {
-                return elm.getText().then((val) => {
+        async getTextList(trim) {
+            return await this.map(async (elm) => {
+                return await elm.getText().then((val) => {
                     return trim ? val.trim() : val;
                 });
             });
         },
 
-        getTextListLimit(limit, trim) {
-            return this.map((elm, i) => {
+        async getTextListLimit(limit, trim) {
+            return await this.map(async (elm, i) => {
                 if (!limit || i < limit) {
-                    return elm.getText().then((val) => {
+                    return await elm.getText().then((val) => {
                         return trim ? val.trim() : val;
                     });
                 }
             });
         },
 
-        getTextListNorm() {
-            return this.map((elm) => {
-                return elm.getText().then((val) => {
+        async getTextListNorm() {
+            return await this.map(async (elm) => {
+                return await elm.getText().then((val) => {
                     return val.replace(/\n/g, ' ');
                 });
             });
         },
 
-        getTextListLowerCase() {
-            return this.map((elm) => {
-                return elm.getText().then((val) => {
+        async getTextListLowerCase() {
+            return await this.map(async (elm) => {
+                return await elm.getText().then((val) => {
                     return val.trim().toLowerCase();
                 });
             });
         },
 
-        getTextListSubstring(char) {
-            return this.map((elm) => {
-                return elm.getText().then((val) => {
+        async getTextListSubstring(char) {
+            return await this.map(async (elm) => {
+                return await elm.getText().then((val) => {
                     return val.split(char)[0].trim();
                 });
             });
         },
 
-        getIntList() {
-            return this.map((elm) => {
-                return elm.getText().then((val) => {
+        async getIntList() {
+            return await this.map(async (elm) => {
+                return await elm.getText().then((val) => {
                     return parseInt(val.trim());
                 });
             });
         },
 
-        getAttributeList(attribute) {
-            return this.map((elm) => {
-                return elm.getAttribute(attribute).then((val) => {
+        async getAttributeList(attribute) {
+            return await this.map(async (elm) => {
+                return await elm.getAttribute(attribute).then((val) => {
                     return val.trim();
                 });
             });
         },
 
-        getAllByText(text) {
-            return this.all(By.xpath(`./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]`));
+        async getAllByText(text) {
+            return await this.all(By.xpath(`./..//*[normalize-space(text())="${text}" or normalize-space(.)="${text}"]`));
         },
 
-        getFirstByText(text) {
-            return this.getAllByText(text).getFirstVisible();
+        async getFirstByText(text) {
+            return await this.getAllByText(text).getFirstVisible();
         },
 
-        clickFirstByText(text) {
-            return this.getAllByText(text).clickAtFirstVisible();
+        async clickFirstByText(text) {
+            return await this.getAllByText(text).clickAtFirstVisible();
         },
 
-        getAllByTextContains(text) {
-            return this.all(By.xpath(`./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]`));
+        async getAllByTextContains(text) {
+            return await this.all(By.xpath(`./..//*[contains(normalize-space(text()),"${text}") or contains(normalize-space(.),"${text}")]`));
         },
 
-        getFirstByTextContains(text) {
-            return this.getAllByTextContains(text).getFirstVisible();
+        async getFirstByTextContains(text) {
+            return await this.getAllByTextContains(text).getFirstVisible();
         },
 
-        clickFirstByTextContains(text) {
-            return this.getAllByTextContains(text).clickAtFirstVisible();
+        async clickFirstByTextContains(text) {
+            return await this.getAllByTextContains(text).clickAtFirstVisible();
         },
 
-        clickAtLink(text) {
-            return this.all(By.linkText(text)).first().click();
+        async clickAtLink(text) {
+            return await this.all(By.linkText(text)).first().click();
         },
 
-        getReadyFirst() {
-            this.waitReady();
-            return this.first();
+        async getReadyFirst() {
+            await this.waitReady();
+            return await this.first();
         },
 
-        clickReadyFirst() {
-            this.getReadyFirst().click();
+        async clickReadyFirst() {
+            await this.getReadyFirst().click();
         },
 
-        getReadyLast() {
-            this.waitReady();
-            return this.last();
+        async getReadyLast() {
+            await this.waitReady();
+            return await this.last();
         },
 
-        clickReadyLast() {
-            this.getReadyLast().click();
+        async clickReadyLast() {
+            await this.getReadyLast().click();
         },
 
-        getReadyByIndex(index) {
-            this.waitReady();
-            return this.get(index).waitReady();
+        async getReadyByIndex(index) {
+            await this.waitReady();
+            return await this.get(index).waitReady();
         }
 
     });
 })();
+
 (() => {
     let ElementArrayFinder = $$('').constructor;
     const base = new Base();
@@ -1083,31 +1048,32 @@ module.exports = new Base();
                 get() {
                     return this;
                 },
-                getNames() {
-                    return labels.getTextList();
+                async getNames() {
+                    return await labels.getTextList();
                 },
-                isSelectedByName(name) {
-                    return labels.getFirstByTextContains(name).$('input').isSelected();
+                async isSelectedByName(name) {
+                    return await labels.getFirstByTextContains(name).$('input').isSelected();
                 },
-                getByName(name) {
-                    return labels.getFirstByText(name);
+                async getByName(name) {
+                    return await labels.getFirstByText(name);
                 },
-                getByNameContains(name) {
-                    return labels.getFirstByTextContains(name);
+                async getByNameContains(name) {
+                    return await labels.getFirstByTextContains(name);
                 },
-                selectByName(name) {
-                    labels.clickFirstByText(name);
+                async selectByName(name) {
+                    await labels.clickFirstByText(name);
                 },
-                selectByNameContains(name) {
-                    labels.clickFirstByTextContains(name);
+                async selectByNameContains(name) {
+                    await labels.clickFirstByTextContains(name);
                 },
-                selectByIndex(index) {
-                    labels.get(index).click();
+                async selectByIndex(index) {
+                    await labels.get(index).click();
                 }
             }
         }
     });
 })();
+
 /**
  * Custom locators.
  */
@@ -1161,67 +1127,67 @@ module.exports = new Base();
 (() => {
     Object.assign(Array.prototype, {
 
-            contains(it) {
-                return this.indexOf(it) > -1;
-            },
-
-            containsOneOf(arr) {
-                var found = false;
-                this.forEach((it) => {
-                    if (arr.indexOf(it) > -1) {
-                        found = true;
-                    }
-                });
-                return found;
-            },
-
-            toLowerCase() {
-                return this.map((el) => {
-                    return el.toLowerCase();
-                });
-            },
-
-            toUpperCase() {
-                return this.map((el) => {
-                    return el.toUpperCase();
-                });
-            },
-
-            removeEmpty() {
-                return this.filter((el) => {
-                    return !el.isEmpty();
-                });
-            }
+        contains(it) {
+            return this.indexOf(it) > -1;
         },
 
-        Object.assign(String.prototype, {
+        containsOneOf(arr) {
+            var found = false;
+            this.forEach((it) => {
+                if (arr.indexOf(it) > -1) {
+                    found = true;
+                }
+            });
+            return found;
+        },
 
-            contains(it) {
-                return this.indexOf(it) !== -1;
-            },
+        toLowerCase() {
+            return this.map((el) => {
+                return el.toLowerCase();
+            });
+        },
 
-            containsOneOf(arr) {
-                var found = false;
-                var text = this;
-                arr.forEach((it) => {
-                    if (text.contains(it)) {
-                        found = true;
-                    }
-                });
-                return found;
-            },
+        toUpperCase() {
+            return this.map((el) => {
+                return el.toUpperCase();
+            });
+        },
 
-            format() {
-                var args = arguments;
-                var i = -1;
-                return this.replace(/\{(?:[^{}]|\{*\})*\}/g, (val) => {
-                    i++;
-                    return args[i] !== undefined ? args[i] : val;
-                });
-            },
+        removeEmpty() {
+            return this.filter((el) => {
+                return !el.isEmpty();
+            });
+        }
+    });
 
-            getDigits() {
-                return this.match(/\d+/)[0]
-            }
-        }))
+    Object.assign(String.prototype, {
+
+        contains(it) {
+            return this.indexOf(it) !== -1;
+        },
+
+        containsOneOf(arr) {
+            var found = false;
+            var text = this;
+            arr.forEach((it) => {
+                if (text.contains(it)) {
+                    found = true;
+                }
+            });
+            return found;
+        },
+
+        format() {
+            var args = arguments;
+            var i = -1;
+            return this.replace(/\{(?:[^{}]|\{*\})*\}/g, (val) => {
+                i++;
+                return args[i] !== undefined ? args[i] : val;
+            });
+        },
+
+        getDigits() {
+            return this.match(/\d+/)[0]
+        }
+    })
 })();

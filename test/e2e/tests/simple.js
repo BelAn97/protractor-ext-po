@@ -6,7 +6,7 @@ describe('Simple Test Suit', function() {
         feature.open();
     });
 
-    it('Negative test', async () => {
+    it('Negative test', () => {
         feature.open();
         feature.featuresHeadlineList.checkTextListEqual(feature.CONST.HEADLINES)
     });
