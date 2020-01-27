@@ -1,5 +1,8 @@
 #Changelog
 
+###2.0.0
+remove flow.execute
+
 ###1.2.0
 new features
 

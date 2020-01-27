@@ -1,6 +1,6 @@
 {
   "name": "protractor-ext-po",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Extension for work with protractor page objects",
   "main": "dist/protractor-ext-po.js",
   "keywords": [

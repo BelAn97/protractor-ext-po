@@ -4,10 +4,11 @@
     Object.assign(ElementArrayFinder.prototype, {
 
         asRadio() {
+            let root = this;
             let labels = this.getParents();
             return {
                 get() {
-                    return this;
+                    return root;
                 },
                 getNames() {
                     return labels.getTextList();

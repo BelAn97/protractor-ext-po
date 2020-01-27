@@ -5,22 +5,23 @@
     Object.assign(ElementFinder.prototype, {
 
         asCheckBox() {
+            let root = this;
             return {
                 get() {
-                    return this;
+                    return root;
                 },
                 check() {
                     if (!this.isChecked()) {
-                        this.clickScript();
+                        root.clickByScript();
                     }
                 },
                 uncheck() {
                     if (this.isChecked()) {
-                        this.clickScript();
+                        root.clickByScript();
                     }
                 },
                 isChecked() {
-                    return this.isSelected();
+                    return root.isSelected();
                 }
             };
         }

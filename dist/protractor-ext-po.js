@@ -6,7 +6,6 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiThings);
 chai.use(chaiAsPromised);
 global.should = chai.should();
-global.flow = protractor.promise.controlFlow();
 
 class Base {
 
@@ -43,22 +42,16 @@ class Base {
     };
 
     debug() {
-        flow.execute(() => {
-            console.log(`debug`);
-            browser.debugger();
-        });
+        console.log(`debug`);
+        browser.debugger();
     };
 
     setWaitForAngularEnabled() {
-        flow.execute(() => {
-            browser.waitForAngularEnabled(true);
-        });
+        browser.waitForAngularEnabled(true);
     };
 
     setWaitForAngularDisabled() {
-        flow.execute(() => {
-            browser.waitForAngularEnabled(false);
-        });
+        browser.waitForAngularEnabled(false);
     };
 
     /**
@@ -77,10 +70,8 @@ class Base {
     };
 
     sleep(ms) {
-        flow.execute(() => {
-            console.log(`*sleep: ${ms} ms`);
-            browser.sleep(ms);
-        });
+        console.log(`*sleep: ${ms} ms`);
+        browser.sleep(ms);
     };
 
     pause() {
@@ -89,9 +80,15 @@ class Base {
 
     log(value) {
         if (!!value) {
-            flow.execute(() => {
-                console.log(value);
-            });
+            console.log(value);
+            if (!!currentTest) {
+                logReport.log(currentTest, value);
+                if (!currentTest.log) {
+                    currentTest.log = value;
+                } else {
+                    currentTest.log += '\n' + value;
+                }
+            }
         }
     };
 
@@ -139,11 +136,9 @@ class Base {
      * @requires page to include `loaded` webElement
      */
     at(timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.logTitle();
-            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Page: ` + (this.url || ``));
-        });
+        this.checkWaitForAngular();
+        this.logTitle();
+        browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Page: ` + (this.url || ``));
     };
 
     /**
@@ -152,10 +147,8 @@ class Base {
      * @requires page to include `loaded` webElement
      */
     atFrame(timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Frame: ${this.iframe}`);
-        });
+        this.checkWaitForAngular();
+        browser.wait(this.EC.presenceOf(this.loaded), timeout || this.timeout.xxxl, `Wait Loaded Element For Frame: ${this.iframe}`);
     };
 
     /**
@@ -164,17 +157,13 @@ class Base {
      * @requires page to include `url` variable
      */
     atUrl(url, timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.waitForUrl(url || this.url, timeout);
-        });
+        this.checkWaitForAngular();
+        this.waitForUrl(url || this.url, timeout);
     };
 
     atUrlContains(url, timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.waitForUrlContains(url || this.url, timeout);
-        });
+        this.checkWaitForAngular();
+        this.waitForUrlContains(url || this.url, timeout);
     };
 
     /**
@@ -183,17 +172,13 @@ class Base {
      * @requires page to include `title` variable
      */
     atTitle(title, timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.waitForTitle(title || this.title, timeout);
-        });
+        this.checkWaitForAngular();
+        this.waitForTitle(title || this.title, timeout);
     };
 
     atTitleContains(title, timeout) {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.waitForTitleContains(title || this.title, timeout);
-        });
+        this.checkWaitForAngular();
+        this.waitForTitleContains(title || this.title, timeout);
     };
 
     /**
@@ -203,28 +188,22 @@ class Base {
      * @requires page have both `url` and `loaded` properties
      */
     goTo() {
-        flow.execute(() => {
-            this.checkWaitForAngular();
-            this.log(`*goTo: ${base.domain + this.url}`);
-            browser.navigate().to(base.domain + this.url);
-            this.at();
-        });
+        this.checkWaitForAngular();
+        this.log(`*goTo: ${base.domain + this.url}`);
+        browser.navigate().to(base.domain + this.url);
+        this.at();
     };
 
     goToUrl(url) {
-        flow.execute(() => {
-            url = url || base.domain + this.url;
-            this.log(`*goTo url: ${url}`);
-            browser.navigate().to(url);
-            this.pause();
-        });
+        url = url || base.domain + this.url;
+        this.log(`*goTo url: ${url}`);
+        browser.navigate().to(url);
+        this.pause();
     };
 
     goToPath(path) {
-        flow.execute(() => {
-            this.log(`*goTo path: ` + base.domain + path);
-            browser.get(base.domain + path);
-        });
+        this.log(`*goTo path: ` + base.domain + path);
+        browser.get(base.domain + path);
     };
 
     saveCurrentUrl() {
@@ -235,11 +214,9 @@ class Base {
     };
 
     goToSavedUrl() {
-        flow.execute(() => {
-            this.log(`*goTo saved url: ${this.savedUrl}`);
-            browser.navigate().to(this.savedUrl);
-            this.pause();
-        });
+        this.log(`*goTo saved url: ${this.savedUrl}`);
+        browser.navigate().to(this.savedUrl);
+        this.pause();
     };
 
     restart() {
@@ -262,20 +239,16 @@ class Base {
 
     goBack() {
         this.log(`*goBack`);
-        flow.execute(() => {
-            this.pause();
-            browser.navigate().back();
-            this.pause();
-        });
+        this.pause();
+        browser.navigate().back();
+        this.pause();
     };
 
     goForward() {
         this.log(`*goForward`);
-        flow.execute(() => {
-            this.pause();
-            browser.navigate().forward();
-            this.pause();
-        });
+        this.pause();
+        browser.navigate().forward();
+        this.pause();
     };
 
     switchToWindow(windowHandleIndex) {
@@ -287,34 +260,30 @@ class Base {
 
     switchToDefault() {
         this.setWaitForAngularDisabled();
-        flow.execute(() => {
-            browser.switchTo().defaultContent().then(
-                () => {
-                }, (err) => {
-                    console.log(err);
-                }
-            );
-        });
+        browser.switchTo().defaultContent().then(
+            () => {
+            }, (err) => {
+                console.log(err);
+            }
+        );
     };
 
     switchToDefaultState() {
         this.setWaitForAngularDisabled();
-        flow.execute(() => {
-            browser.switchTo().defaultContent().then(() => {
-                    browser.getAllWindowHandles().then((handles) => {
-                        for (let i = 1; i < handles.length; i++) {
-                            browser.switchTo().window(handles[i]);
-                            browser.close();
-                        }
-                    });
-                },
-                (err) => {
-                    console.log(err);
-                    browser.restart();
-                    browser.switchTo().activeElement();
-                }
-            );
-        });
+        browser.switchTo().defaultContent().then(() => {
+                browser.getAllWindowHandles().then((handles) => {
+                    for (let i = 1; i < handles.length; i++) {
+                        browser.switchTo().window(handles[i]);
+                        browser.close();
+                    }
+                });
+            },
+            (err) => {
+                console.log(err);
+                browser.restart();
+                browser.switchTo().activeElement();
+            }
+        );
     };
 
     switchToNew(currentWinHandle) {
@@ -465,6 +434,7 @@ class Base {
 }
 
 module.exports = new Base();
+
 (() => {
     let ElementFinder = $(``).constructor;
     const base = new Base();
@@ -762,27 +732,29 @@ module.exports = new Base();
     Object.assign(ElementFinder.prototype, {
 
         asCheckBox() {
+            let root = this;
             return {
                 get() {
-                    return this;
+                    return root;
                 },
                 check() {
                     if (!this.isChecked()) {
-                        this.clickScript();
+                        root.clickByScript();
                     }
                 },
                 uncheck() {
                     if (this.isChecked()) {
-                        this.clickScript();
+                        root.clickByScript();
                     }
                 },
                 isChecked() {
-                    return this.isSelected();
+                    return root.isSelected();
                 }
             };
         }
     });
 })();
+
 (() => {
     let ElementArrayFinder = $$(``).constructor;
     const base = new Base();
@@ -1078,10 +1050,11 @@ module.exports = new Base();
     Object.assign(ElementArrayFinder.prototype, {
 
         asRadio() {
+            let root = this;
             let labels = this.getParents();
             return {
                 get() {
-                    return this;
+                    return root;
                 },
                 getNames() {
                     return labels.getTextList();
@@ -1108,6 +1081,7 @@ module.exports = new Base();
         }
     });
 })();
+
 /**
  * Custom locators.
  */
@@ -1161,67 +1135,67 @@ module.exports = new Base();
 (() => {
     Object.assign(Array.prototype, {
 
-            contains(it) {
-                return this.indexOf(it) > -1;
-            },
-
-            containsOneOf(arr) {
-                var found = false;
-                this.forEach((it) => {
-                    if (arr.indexOf(it) > -1) {
-                        found = true;
-                    }
-                });
-                return found;
-            },
-
-            toLowerCase() {
-                return this.map((el) => {
-                    return el.toLowerCase();
-                });
-            },
-
-            toUpperCase() {
-                return this.map((el) => {
-                    return el.toUpperCase();
-                });
-            },
-
-            removeEmpty() {
-                return this.filter((el) => {
-                    return !el.isEmpty();
-                });
-            }
+        contains(it) {
+            return this.indexOf(it) > -1;
         },
 
-        Object.assign(String.prototype, {
+        containsOneOf(arr) {
+            var found = false;
+            this.forEach((it) => {
+                if (arr.indexOf(it) > -1) {
+                    found = true;
+                }
+            });
+            return found;
+        },
 
-            contains(it) {
-                return this.indexOf(it) !== -1;
-            },
+        toLowerCase() {
+            return this.map((el) => {
+                return el.toLowerCase();
+            });
+        },
 
-            containsOneOf(arr) {
-                var found = false;
-                var text = this;
-                arr.forEach((it) => {
-                    if (text.contains(it)) {
-                        found = true;
-                    }
-                });
-                return found;
-            },
+        toUpperCase() {
+            return this.map((el) => {
+                return el.toUpperCase();
+            });
+        },
 
-            format() {
-                var args = arguments;
-                var i = -1;
-                return this.replace(/\{(?:[^{}]|\{*\})*\}/g, (val) => {
-                    i++;
-                    return args[i] !== undefined ? args[i] : val;
-                });
-            },
+        removeEmpty() {
+            return this.filter((el) => {
+                return !el.isEmpty();
+            });
+        }
+    });
 
-            getDigits() {
-                return this.match(/\d+/)[0]
-            }
-        }))
+    Object.assign(String.prototype, {
+
+        contains(it) {
+            return this.indexOf(it) !== -1;
+        },
+
+        containsOneOf(arr) {
+            var found = false;
+            var text = this;
+            arr.forEach((it) => {
+                if (text.contains(it)) {
+                    found = true;
+                }
+            });
+            return found;
+        },
+
+        format() {
+            var args = arguments;
+            var i = -1;
+            return this.replace(/\{(?:[^{}]|\{*\})*\}/g, (val) => {
+                i++;
+                return args[i] !== undefined ? args[i] : val;
+            });
+        },
+
+        getDigits() {
+            return this.match(/\d+/)[0]
+        }
+    })
 })();
