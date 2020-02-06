@@ -26,18 +26,34 @@
         },
 
         async waitClickable(timeout) {
-            browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, `wait clickable: ${this.locator()}`);
+            await browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, `wait clickable: ${this.locator()}`);
             return this;
         },
 
         async waitForText(text, timeout) {
-            browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, `wait for text: ${this.locator()}`);
+            await browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, `wait for text: ${this.locator()}`);
             return this;
         },
 
         async waitForValue(value, timeout) {
             await browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, `wait for value: ${this.locator()}`);
             return this;
+        },
+
+        async isDisplayedWait(timeoutMs) {
+            let timeout = browser.getPageTimeout;
+            browser.getPageTimeout = timeoutMs || 0;
+            let displayed = await this.isDisplayed();
+            browser.getPageTimeout = timeout;
+            return displayed;
+        },
+
+        async isPresentWait(timeoutMs) {
+            let timeout = browser.getPageTimeout;
+            browser.getPageTimeout = timeoutMs || 0;
+            let present = await this.isPresent();
+            browser.getPageTimeout = timeout;
+            return present;
         },
 
         getParent() {
@@ -73,12 +89,12 @@
             });
         },
 
-        async findByText(searchText) {
-            return await this.element(by.xpath(`.//*[text()="${searchText}"]`));
+        findByText(searchText) {
+            return this.element(by.xpath(`.//*[text()="${searchText}"]`));
         },
 
         async focus() {
-            browser.actions().mouseMove(this.waitReady()).perform();
+            await browser.actions().mouseMove(this.waitReady()).perform();
             return this;
         },
 

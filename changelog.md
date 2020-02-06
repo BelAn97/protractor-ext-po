@@ -1,6 +1,6 @@
 #Changelog
 
-###2.0.3
+###2.0.4
 use await/async
 
 ###2.0.1
