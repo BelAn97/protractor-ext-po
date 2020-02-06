@@ -162,7 +162,7 @@
 
         async getReadyFirst() {
             await this.waitReady();
-            return await this.first();
+            return this.first();
         },
 
         async clickReadyFirst() {
@@ -171,7 +171,7 @@
 
         async getReadyLast() {
             await this.waitReady();
-            return await this.last();
+            return this.last();
         },
 
         async clickReadyLast() {

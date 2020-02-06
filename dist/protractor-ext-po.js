@@ -556,7 +556,7 @@ module.exports = new Base();
             return this;
         },
 
-        async getParent() {
+        getParent() {
             return this.element(by.xpath(`./..`));
         },
 
@@ -1048,7 +1048,7 @@ module.exports = new Base();
 
         async getReadyFirst() {
             await this.waitReady();
-            return await this.first();
+            return this.first();
         },
 
         async clickReadyFirst() {
@@ -1057,7 +1057,7 @@ module.exports = new Base();
 
         async getReadyLast() {
             await this.waitReady();
-            return await this.last();
+            return this.last();
         },
 
         async clickReadyLast() {

@@ -40,7 +40,7 @@
             return this;
         },
 
-        async getParent() {
+        getParent() {
             return this.element(by.xpath(`./..`));
         },
 
