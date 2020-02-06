@@ -1,5 +1,8 @@
 #Changelog
 
+###2.0.1
+add selector type
+
 ###2.0.0
 remove flow.execute
 
