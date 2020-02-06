@@ -751,6 +751,28 @@ module.exports = new Base();
                     return root.isSelected();
                 }
             };
+        },
+        asSelector() {
+            let root = this;
+            let options = root.$$('option');
+            let selected = root.$$('option[selected="selected"]');
+            return {
+                get() {
+                    return root;
+                },
+                select(itemName) {
+                    root.element(by.cssContainingText('option', itemName)).click();
+                },
+                getSelected() {
+                    return selected.getText();
+                },
+                getOptions() {
+                    return options;
+                },
+                getOptionsList() {
+                    return options.getTextList();
+                }
+            };
         }
     });
 })();
