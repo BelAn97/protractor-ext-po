@@ -8,9 +8,9 @@ class Toolbar {
         this.featureLink = this.toolbar.$('[title="Features"]');
     }
 
-    goToFeature(){
-        this.featureLink.clickReady();
-        feature.at();
+    async goToFeature(){
+        await this.featureLink.clickReady();
+        await feature.at();
     }
 
 }

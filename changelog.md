@@ -1,5 +1,8 @@
 #Changelog
 
+###2.0.2
+use await/async
+
 ###2.0.1
 add selector type
 

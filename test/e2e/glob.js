@@ -11,15 +11,15 @@ global.feature = require('./pages/feature.po');
 global.logReport = require('mochawesome-screenshots/logReport');
 global.currentTest = undefined;
 
-before('login', function() {
+before('login', async function () {
     global.currentTest = this.test;
-    browser.waitForAngularEnabled(false);
+    await browser.waitForAngularEnabled(false);
     base.setDomain('https://angular.io/');
     base.setDownload(path.join(__dirname, '../downloads/'));
-    home.goTo();
+    await home.goTo();
 });
 
-beforeEach('check login', function() {
+beforeEach('check login', async function () {
     browser.manage().window().setSize(1600, 1024);
     global.currentTest = this.currentTest;
 });

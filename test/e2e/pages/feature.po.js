@@ -17,8 +17,8 @@ class FeaturePage{
         };
     }
 
-    open() {
-        toolbar.goToFeature();
+    async open() {
+        await toolbar.goToFeature();
     };
 
 }

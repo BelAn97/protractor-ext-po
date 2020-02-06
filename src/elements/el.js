@@ -5,205 +5,207 @@
     const base = new Base();
     Object.assign(ElementFinder.prototype, {
 
-        waitInDom(timeout) {
-            browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
+        async waitInDom(timeout) {
+            await browser.wait(base.EC.presenceOf(this), timeout || base.timeout.xxl, `wait in dom: ${this.locator()}`);
             return this;
         },
 
-        waitNotInDom(timeout) {
-            browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, `wait not in dom: ${this.locator()}`);
+        async waitNotInDom(timeout) {
+            await browser.wait(base.EC.stalenessOf(this), timeout || base.timeout.xxl, `wait not in dom: ${this.locator()}`);
             return this;
         },
 
-        waitReady(timeout) {
-            browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, `wait for visible: ${this.locator()}`);
+        async waitReady(timeout) {
+            await browser.wait(base.EC.visibilityOf(this), timeout || base.timeout.xxl, `wait for visible: ${this.locator()}`);
             return this;
         },
 
-        waitInvisible(timeout) {
-            browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, `wait for invisible: ${this.locator()}`);
+        async waitInvisible(timeout) {
+            await browser.wait(base.EC.invisibilityOf(this), timeout || base.timeout.xxl, `wait for invisible: ${this.locator()}`);
             return this;
         },
 
-        waitClickable(timeout) {
+        async waitClickable(timeout) {
             browser.wait(base.EC.elementToBeClickable(this), timeout || base.timeout.xxl, `wait clickable: ${this.locator()}`);
             return this;
         },
 
-        waitForText(text, timeout) {
+        async waitForText(text, timeout) {
             browser.wait(base.EC.textToBePresentInElement(this, text), timeout || base.timeout.xxl, `wait for text: ${this.locator()}`);
             return this;
         },
 
-        waitForValue(value, timeout) {
-            browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, `wait for value: ${this.locator()}`);
+        async waitForValue(value, timeout) {
+            await browser.wait(base.EC.textToBePresentInElementValue(this, value), timeout || base.timeout.xxl, `wait for value: ${this.locator()}`);
             return this;
         },
 
-        getParent() {
-            return this.element(By.xpath(`./..`));
+        async getParent() {
+            return this.element(by.xpath(`./..`));
         },
 
-        getValue() {
-            return this.getAttribute(`value`);
+        async getValue() {
+            return (await this.getAttribute(`value`));
         },
 
-        hasClass(klass) {
-            return this.getAttribute(`class`).then((classes) => {
+        async hasClass(klass) {
+            return await this.getAttribute(`class`).then((classes) => {
                 base.log(`class attribute: ${classes}`);
                 return classes.split(` `).indexOf(klass) !== -1;
             });
         },
 
-        getInt() {
-            return this.getTextReady().then((text) => {
+        async getInt() {
+            return await this.getTextReady().then((text) => {
                 return parseInt(text.match(/\d+/)[0]);
             });
         },
 
-        getWidth() {
-            return this.getSize().then((size) => {
+        async getWidth() {
+            return await this.getSize().then((size) => {
                 return size.width;
             });
         },
 
-        getNumber() {
-            return this.getTextReady().then((text) => {
+        async getNumber() {
+            return await this.getTextReady().then((text) => {
                 return parseFloat(text);
             });
         },
 
-        findByText(searchText) {
-            return this.element(By.xpath(`.//*[text()="${searchText}"]`));
+        async findByText(searchText) {
+            return await this.element(by.xpath(`.//*[text()="${searchText}"]`));
         },
 
-        focus() {
+        async focus() {
             browser.actions().mouseMove(this.waitReady()).perform();
             return this;
         },
 
-        focusBy(xCoordinate, yCoordinate) {
-            browser.actions().mouseMove(this.waitReady(), {x: xCoordinate, y: yCoordinate}).perform();
+        async focusBy(xCoordinate, yCoordinate) {
+            await browser.actions().mouseMove(this.waitReady(), {x: xCoordinate, y: yCoordinate}).perform();
             return this;
         },
 
-        focusClick() {
-            return this.focus().clickReady();
+        async focusClick() {
+            return await this.focus().clickReady();
         },
 
-        clearAndSetText(text) {
-            let input = this.waitReady();
-            input.clear().sendKeys(text);
+        async clearAndSetText(text) {
+            let input = await this.waitReady();
+            await input.clear().sendKeys(text);
             return this;
         },
 
-        sendKeysSlow(text, interval) {
-            let input = this.waitReady();
-            text.split(``).forEach((char) => {
-                input.sendKeys(char);
-                base.sleep(interval || base.timeout.zero);
+        async sendKeysSlow(text, interval) {
+            let input = await this.waitReady();
+            await text.split(``).forEach(async (char) => {
+                await input.sendKeys(char);
+                await base.sleep(interval || base.timeout.zero);
             });
             return this;
         },
 
-        clickReady() {
-            this.waitClickable().click();
-        },
-
-        clickByScript() {
-            this.waitInDom();
-            browser.executeScript(`arguments[0].click();`, this);
+        async clickReady() {
+            await this.waitClickable();
+            await this.click();
             return this;
         },
 
-        clickAndWaitInvisible() {
-            this.click();
-            this.waitInvisible();
-        },
-
-        clickAtCenter() {
-            browser.actions().click(this.waitClickable()).perform();
+        async clickByScript() {
+            await this.waitInDom();
+            await browser.executeScript(`arguments[0].click();`, this);
             return this;
         },
 
-        clickAtCorner() {
-            browser.actions().mouseMove(this.waitClickable(), {x: 1, y: 1}).click().perform();
+        async clickAndWaitInvisible() {
+            await this.click();
+            await this.waitInvisible();
+        },
+
+        async clickAtCenter() {
+            await browser.actions().click(this.waitClickable()).perform();
             return this;
         },
 
-        clickIfExists() {
-            if (this.isPresent() && this.isDisplayed()) {
-                this.click();
+        async clickAtCorner() {
+            await browser.actions().mouseMove(this.waitClickable(), {x: 1, y: 1}).click().perform();
+            return this;
+        },
+
+        async clickIfExists() {
+            if (await this.isPresent() && await this.isDisplayed()) {
+                await this.click();
             }
         },
 
-        clickByCoordinates(xPos, yPos) {
-            browser.actions().mouseMove(this.waitReady(), {x: xPos, y: yPos}).click().perform();
+        async clickByCoordinates(xPos, yPos) {
+            await browser.actions().mouseMove(this.waitReady(), {x: xPos, y: yPos}).click().perform();
             return this;
         },
 
-        clickXTimes(repeatNumber) {
+        async clickXTimes(repeatNumber) {
             for (let i = 0; i < repeatNumber; i++) {
-                this.clickAndWait();
+                await this.clickAndWait();
             }
             return this;
         },
 
-        doubleClick() {
-            browser.actions().doubleClick().perform();
+        async doubleClick() {
+            await browser.actions().doubleClick().perform();
             return this;
         },
 
-        pasteFromClipboard(value) {
-            buffer.copy(value);
-            this.clickReady();
-            base.sleep(base.timeout.min);
-            browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
+        async pasteFromClipboard(value) {
+            await buffer.copy(value);
+            await this.clickReady();
+            await base.sleep(base.timeout.min);
+            await browser.actions().sendKeys(protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.INSERT)).perform();
         },
 
-        pressEnter() {
-            browser.actions().sendKeys(protractor.Key.ENTER).perform();
+        async pressEnter() {
+            await browser.actions().sendKeys(protractor.Key.ENTER).perform();
             return this;
         },
 
-        pressHome() {
-            browser.actions().sendKeys(protractor.Key.HOME).perform();
+        async pressHome() {
+            await browser.actions().sendKeys(protractor.Key.HOME).perform();
             return this;
         },
 
-        pressTab() {
-            browser.actions().sendKeys(protractor.Key.TAB).perform();
+        async pressTab() {
+            await browser.actions().sendKeys(protractor.Key.TAB).perform();
             return this;
         },
 
-        pressUp() {
-            browser.actions().sendKeys(protractor.Key.UP).perform();
+        async pressUp() {
+            await browser.actions().sendKeys(protractor.Key.UP).perform();
             return this;
         },
 
-        pressDown() {
-            browser.actions().sendKeys(protractor.Key.DOWN).perform();
+        async pressDown() {
+            await browser.actions().sendKeys(protractor.Key.DOWN).perform();
             return this;
         },
 
-        getTextReady() {
-            return this.waitReady().getText();
+        async getTextReady() {
+            return (await (await this.waitReady()).getText());
         },
 
-        scrollAndGetTextList(list, scrolledPanel, scrolledElements, scrollCount) {
-            browser.executeScript(`arguments[0].scrollIntoView(false);`, scrolledPanel);
-            return this.getTextList().then((newList) => {
+        async scrollAndGetTextList(list, scrolledPanel, scrolledElements, scrollCount) {
+            await browser.executeScript(`arguments[0].scrollIntoView(false);`, scrolledPanel);
+            return await this.getTextList().then(async (newList) => {
                 if (scrollCount > 0) {
-                    return this.scrollAndGetTextList(_.union(list, newList), scrolledPanel, scrolledElements, scrollCount - 1);
+                    return await this.scrollAndGetTextList(_.union(list, newList), scrolledPanel, scrolledElements, scrollCount - 1);
                 } else {
                     return _.union(list, newList);
                 }
             });
         },
 
-        getTextListAtScrolled(scrolledElements, scrollCount) {
-            return scrolledElements.getTextList().then((list) => {
-                return this.scrollAndGetTextList(list, this, scrolledElements, scrollCount)
+        async getTextListAtScrolled(scrolledElements, scrollCount) {
+            return await scrolledElements.getTextList().then(async (list) => {
+                return await this.scrollAndGetTextList(list, this, scrolledElements, scrollCount)
             });
         }
 

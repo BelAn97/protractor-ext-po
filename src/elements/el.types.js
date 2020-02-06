@@ -10,18 +10,18 @@
                 get() {
                     return root;
                 },
-                check() {
-                    if (!this.isChecked()) {
-                        root.clickByScript();
+                async check() {
+                    if (!await this.isChecked()) {
+                        await root.clickByScript();
                     }
                 },
-                uncheck() {
-                    if (this.isChecked()) {
-                        root.clickByScript();
+                async uncheck() {
+                    if (await this.isChecked()) {
+                        await root.clickByScript();
                     }
                 },
-                isChecked() {
-                    return root.isSelected();
+                async isChecked() {
+                    return (await root.isSelected());
                 }
             };
         },
@@ -33,17 +33,17 @@
                 get() {
                     return root;
                 },
-                select(itemName) {
-                    root.element(by.cssContainingText('option', itemName)).click();
+                async select(itemName) {
+                    await root.element(by.cssContainingText('option', itemName)).click();
                 },
-                getSelected() {
-                    return selected.getText();
+                async getSelected() {
+                    return await selected.getText();
                 },
                 getOptions() {
                     return options;
                 },
-                getOptionsList() {
-                    return options.getTextList();
+                async getOptionsList() {
+                    return await options.getTextList();
                 }
             };
         }
